@@ -6,8 +6,8 @@
 #include "rightWheel.h"
 #include "robot.h"
 
-leftWheel leftWheelObj(LEFT_PWM, LEFT_DIR);
-rightWheel rightWheelObj(RIGHT_PWM, RIGHT_DIR);
+leftWheel leftWheelObj(LEFT_PWM, LEFT_DIR1, LEFT_DIR2);
+rightWheel rightWheelObj(RIGHT_PWM, RIGHT_DIR1, RIGHT_DIR2);
 ultrasonic frontSensor(FRONT_TRIG, FRONT_ECHO);
 ultrasonic rightSensor(RIGHT_TRIG, RIGHT_ECHO);
 ultrasonic leftSensor(LEFT_TRIG, LEFT_ECHO);
@@ -20,6 +20,7 @@ void setup() {
 void loop()
 {
   Serial.println("Start");
-  myRobot.solveMaze();
+  leftWheelObj.moveForward();
+  leftWheelObj.moveForward();
   Serial.println("End");
 }
