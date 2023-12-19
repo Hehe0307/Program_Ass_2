@@ -9,9 +9,9 @@ class wheel
     void moveForward(); // For forward movmement
     void reverse(); // For rotating 180 degree movement 
     void stop(); // For stopping robot movement
-    virtual void declarePin() = 0; // To be used in child classes 'leftWheel' and 'rightWheel'
-    virtual void turnLeft() = 0; // To be used in child classes 'leftWheel' and 'rightWheel' 
-    virtual void turnRight() = 0; // To be used in child classes 'leftWheel' and 'rightWheel' 
+    virtual void declarePin(); // To be used in child classes 'leftWheel' and 'rightWheel'
+    virtual void turnLeft(); // To be used in child classes 'leftWheel' and 'rightWheel' 
+    virtual void turnRight(); // To be used in child classes 'leftWheel' and 'rightWheel' 
   private:
     const int wheel_pwm; // PWM Pin
     const int wheel_dir_1; // Direction Pin 1

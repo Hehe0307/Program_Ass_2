@@ -3,7 +3,7 @@
 #include "Arduino.h"
 
 // Implementation of 'rightWheel' class
-rightWheel::rightWheel(const int right_pwm, const int right_dir_1, const int right_dir_2) : wheel::wheel(right_pwm, right_dir_1, right_dir_2) {}
+rightWheel::rightWheel(const int right_pwm, const int right_dir_1, const int right_dir_2) : wheel(right_pwm, right_dir_1, right_dir_2) {}
 
 void rightWheel::declarePin() {
   pinMode(right_pwm, OUTPUT);

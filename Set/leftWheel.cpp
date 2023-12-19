@@ -3,7 +3,7 @@
 #include "Arduino.h"
 
 // Implementation of 'leftWheel' class
-leftWheel::leftWheel(const int left_pwm, const int left_dir_1, const int left_dir_2) : wheel::wheel(left_pwm, left_dir_1, left_dir_2) {}
+leftWheel::leftWheel(const int left_pwm, const int left_dir_1, const int left_dir_2) : wheel(left_pwm, left_dir_1, left_dir_2) {}
 
 void leftWheel::declarePin() {
   pinMode(left_pwm, OUTPUT);
