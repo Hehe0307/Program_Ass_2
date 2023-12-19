@@ -6,12 +6,13 @@ class rightWheel : public wheel
 {
   public:
     rightWheel(const int, const int, const int); // Constructor
+    void declarePin(); // For pin declaration
     void turnLeft(); // Implementation of pure virtual function in parent class 'wheel'
     void turnRight(); // Implementation of pure virtual function in parent class 'wheel'
   private:
-    const int right_pwm;
-    const int right_dir1;
-    const int right_dir2;
+    const int right_pwm; // PWM Pin
+    const int right_dir_1; // Direction Pin 1
+    const int right_dir_2; // Direction Pin 2
 };
 
 #endif // RIGHTWHEEL_H_INCLUDED

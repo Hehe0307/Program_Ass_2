@@ -2,8 +2,9 @@
 #include "Arduino.h"
 
 // Implementation of 'ultrasonic' class
-ultrasonic::ultrasonic(const int trigPin, const int echoPin) : trigPin(trigPin), echoPin(echoPin)
-{
+ultrasonic::ultrasonic(const int trigPin, const int echoPin) : trigPin(trigPin), echoPin(echoPin) {}
+
+void ultrasonic::declarePin() {
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
 }

@@ -6,6 +6,7 @@ class ultrasonic
 {
   public:
     ultrasonic(const int, const int); // Constructor
+    void declarePin(); // For pin declaration
     long retrieveData(); // Retrieve sensor readings
   private:
     const int trigPin; // Trigger Pin

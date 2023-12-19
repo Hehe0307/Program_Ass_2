@@ -1,10 +1,10 @@
 // Pin Declaration
 #define LEFT_PWM 5
-#define LEFT_DIR1 4
-#define LEFT_DIR2 A0
+#define LEFT_DIR_1 4
+#define LEFT_DIR_2 A0
 #define RIGHT_PWM 6
-#define RIGHT_DIR1 7
-#define RIGHT_DIR2 A1
+#define RIGHT_DIR_1 7
+#define RIGHT_DIR_2 A1
 
 #define FRONT_TRIG 2
 #define FRONT_ECHO 3
