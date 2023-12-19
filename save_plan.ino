@@ -23,7 +23,6 @@ void setup() {
   pinMode(RIGHT_PWM, OUTPUT);
   pinMode(RIGHT_DIR_1, OUTPUT);
   pinMode(RIGHT_DIR_2, OUTPUT);
-
   pinMode(FRONT_TRIG, OUTPUT);
   pinMode(FRONT_ECHO, INPUT);
   pinMode(RIGHT_TRIG, OUTPUT);
@@ -78,12 +77,25 @@ void moveStop() {
 }
 
 void loop() {
+  Serial.println("Forward");
   moveForward();
   delay(2000);
+  moveStop();
+  delay(2000);
+
+  Serial.println("Left");
   moveLeft();
   delay(2000);
+  moveStop();
+  delay(2000);
+  
+  Serial.println("Right");
   moveRight();
   delay(2000);
+  moveStop();
+  delay(2000);
+
+  Serial.println("Reverse");
   moveReverse();
   delay(2000);
   moveStop();

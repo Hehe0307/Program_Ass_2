@@ -30,27 +30,33 @@ void loop()
   Serial.println("Forward");
   leftWheelObj.moveForward();
   rightWheelObj.moveForward();
-  delay(2000);
+  delay(1000);
+  leftWheelObj.stop();
+  rightWheelObj.stop();
+  delay(1000);
 
   Serial.println("Left");
   leftWheelObj.turnLeft();
   rightWheelObj.turnLeft();
-  delay(2000);
+  delay(1000);
+  leftWheelObj.stop();
+  rightWheelObj.stop();
   
   Serial.println("Right");
   leftWheelObj.turnRight();
   rightWheelObj.turnRight();
-  delay(2000);
+  delay(1000);
+  leftWheelObj.stop();
+  rightWheelObj.stop();
+  delay(1000);
 
   Serial.println("Reverse");
   leftWheelObj.reverse();
   rightWheelObj.reverse();
-  delay(2000);
-
-  Serial.println("Stop");
+  delay(1000);
   leftWheelObj.stop();
   rightWheelObj.stop();
-  delay(2000);
+  delay(1000);
 
   // Ultrasonic Sensor Test
   Serial.print("Front Sensor: ");

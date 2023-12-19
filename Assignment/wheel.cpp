@@ -18,6 +18,6 @@ void wheel::reverse() {
 
 void wheel::stop() {
   digitalWrite(wheel_pwm, LOW);
-  digitalWrite(wheel_dir_1, LOW);
+  digitalWrite(wheel_dir_1, HIGH);
   digitalWrite(wheel_dir_2, LOW);
 }
