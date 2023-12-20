@@ -5,7 +5,6 @@
 struct wheel
 {
     wheel(); // Constructor
-    ~wheel(); // Destructor
     virtual void declarePin() = 0; // For pin declaration
     virtual void moveForward() = 0; // For forward movmement
     virtual void reverse() = 0; // For backward movement 

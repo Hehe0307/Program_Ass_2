@@ -3,5 +3,3 @@
 
 // Implementation of 'wheel' class
 wheel::wheel() {}
-
-wheel::~wheel() {}
