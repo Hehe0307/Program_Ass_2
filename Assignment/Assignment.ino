@@ -30,7 +30,7 @@ void loop()
   Serial.println("Forward");
   leftWheelObj.moveForward();
   rightWheelObj.moveForward();
-  delay(1000);
+  delay(2000);
   leftWheelObj.stop();
   rightWheelObj.stop();
   delay(1000);
@@ -38,14 +38,14 @@ void loop()
   Serial.println("Left");
   leftWheelObj.turnLeft();
   rightWheelObj.turnLeft();
-  delay(1000);
+  delay(2000);
   leftWheelObj.stop();
   rightWheelObj.stop();
   
   Serial.println("Right");
   leftWheelObj.turnRight();
   rightWheelObj.turnRight();
-  delay(1000);
+  delay(2000);
   leftWheelObj.stop();
   rightWheelObj.stop();
   delay(1000);
@@ -53,7 +53,7 @@ void loop()
   Serial.println("Reverse");
   leftWheelObj.reverse();
   rightWheelObj.reverse();
-  delay(1000);
+  delay(2000);
   leftWheelObj.stop();
   rightWheelObj.stop();
   delay(1000);

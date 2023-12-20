@@ -5,14 +5,17 @@
 class rightWheel : public wheel
 {
   public:
-    rightWheel(const int, const int, const int); // Constructor
+    rightWheel(int, int, int); // Constructor
     void declarePin(); // For pin declaration
-    void turnLeft(); // Implementation of pure virtual function in parent class 'wheel'
-    void turnRight(); // Implementation of pure virtual function in parent class 'wheel'
+    void moveForward(); // For forward movmement
+    void reverse(); // For backward movement 
+    void moveLeft(); // For turn left movmement
+    void moveRight(); // For turn right movement 
+    void stop(); // For stopping robot movement
   private:
-    const int right_pwm; // PWM Pin
-    const int right_dir_1; // Direction Pin 1
-    const int right_dir_2; // Direction Pin 2
+    int right_pwm; // PWM Pin
+    int right_dir_1; // Direction Pin 1
+    int right_dir_2; // Direction Pin 2
 };
 
 #endif // RIGHTWHEEL_H_INCLUDED

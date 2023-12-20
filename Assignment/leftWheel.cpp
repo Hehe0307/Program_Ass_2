@@ -3,12 +3,31 @@
 #include "Arduino.h"
 
 // Implementation of 'leftWheel' class
-leftWheel::leftWheel(const int left_pwm, const int left_dir_1, const int left_dir_2) : wheel(left_pwm, left_dir_1, left_dir_2) {}
+leftWheel::leftWheel(int left_pwm, int left_dir_1, int left_dir_2) 
+: left_pwm(left_pwm), left_dir_1(left_dir_1), left_dir_2(left_dir_2) {}
 
 void leftWheel::declarePin() {
   pinMode(left_pwm, OUTPUT);
   pinMode(left_dir_1, OUTPUT);
   pinMode(left_dir_2, OUTPUT);
+}
+
+void leftWheel::moveForward() {
+  digitalWrite(left_pwm, HIGH);
+  digitalWrite(left_dir_1, HIGH);
+  digitalWrite(left_dir_2, LOW);
+}
+
+void leftWheel::reverse() {
+  digitalWrite(left_pwm, HIGH);
+  digitalWrite(left_dir_1, LOW);
+  digitalWrite(left_dir_2, HIGH);
+}
+
+void leftWheel::stop() {
+  digitalWrite(left_pwm, LOW);
+  digitalWrite(left_dir_1, HIGH);
+  digitalWrite(left_dir_2, LOW);
 }
 
 void leftWheel::turnLeft() {

@@ -1,18 +1,17 @@
 #ifndef WHEEL_H_INCLUDED
 #define WHEEL_H_INCLUDED
 
-// Interface class of wheel
-class wheel
+// Interface abstract class of 'wheel'
+struct wheel
 {
-  public:
-    wheel(const int, const int, const int); // Constructor
-    void moveForward(); // For forward movmement
-    void reverse(); // For rotating 180 degree movement 
-    void stop(); // For stopping robot movement
-  private:
-    const int wheel_pwm; // PWM Pin
-    const int wheel_dir_1; // Direction Pin 1
-    const int wheel_dir_2; // Direction Pin 2
+    wheel(); // Constructor
+    ~wheel(); // Destructor
+    virtual void declarePin() = 0; // For pin declaration
+    virtual void moveForward() = 0; // For forward movmement
+    virtual void reverse() = 0; // For backward movement 
+    virtual void moveLeft() = 0; // For turn left movmement
+    virtual void moveRight() = 0; // For turn right movement 
+    virtual void stop() = 0; // For stopping robot movement
 };
 
 #endif // WHEEL_H_INCLUDED
