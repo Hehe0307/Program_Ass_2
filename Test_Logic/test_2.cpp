@@ -18,7 +18,6 @@ const int ECHO_PIN_R = 12;
 
 struct wheel {
     wheel();
-    ~wheel();
     virtual void forward() = 0;
     virtual void left() = 0;
     virtual void right() = 0; 
@@ -76,7 +75,6 @@ class robot {
 };
 
 wheel::wheel() { cout << "A wheel object created" << endl; }
-wheel::~wheel() { cout << "A wheel object destroyed" << endl; }
 
 leftWheel::leftWheel(int left_pwm, int left_dir_1, int left_dir_2) 
 : left_pwm(left_pwm), left_dir_1(left_dir_1), left_dir_2(left_dir_2) {

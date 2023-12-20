@@ -71,38 +71,38 @@ void robot::solveMaze() {
       // delay(100);
     }
     else if ( Front.retrieveData() < dist_thresh && Right.retrieveData() < dist_thresh && Left.retrieveData() < dist_thresh) { // obstacle infront of all 3 sides, reverse
-      LeftWheel.reverse();
-      RightWheel.reverse();
+      LeftWheel.moveReverse();
+      RightWheel.moveReverse();
       // Serial.println("Reverse");
       delay(500);
       if((Left.retrieveData()) > (Right.retrieveData())) { 
-        LeftWheel.turnLeft();
-        RightWheel.turnLeft();
+        LeftWheel.moveLeft();
+        RightWheel.moveLeft();
         // Serial.println("Left");
         // delay(100); 
       }
       else { 
-        LeftWheel.turnRight();
-        RightWheel.turnRight();
+        LeftWheel.moveRight();
+        RightWheel.moveRight();
         // Serial.println("Right"); 
         // delay(100);
       }
     }
     else if (Front.retrieveData() < dist_thresh && Right.retrieveData() < dist_thresh && Left.retrieveData() > dist_thresh) { // obstacle on right and front sides, turn left side 
-      LeftWheel.turnLeft(); 
-      RightWheel.turnLeft(); 
+      LeftWheel.moveLeft(); 
+      RightWheel.moveLeft(); 
       // Serial.println("Left");
       // delay(100);
     }
     else if (Front.retrieveData() < dist_thresh && Right.retrieveData() > dist_thresh && Left.retrieveData() < dist_thresh) { // obstacle on left and front sides, turn right side
-      LeftWheel.turnRight();
-      RightWheel.turnRight();
+      LeftWheel.moveRight();
+      RightWheel.moveRight();
       // Serial.println("Right");
       // delay(100);
     }
     else  if (Front.retrieveData() < dist_thresh && Right.retrieveData() > dist_thresh && Left.retrieveData() > dist_thresh) { // obstacle on front side, turn left & then forward
-      LeftWheel.turnLeft();
-      LeftWheel.turnLeft(); 
+      LeftWheel.moveLeft();
+      LeftWheel.moveLeft(); 
       delay(500); 
       LeftWheel.moveForward();
       RightWheel.moveForward();
@@ -110,8 +110,8 @@ void robot::solveMaze() {
       // delay(100);
     }
     else if (Front.retrieveData() > dist_thresh && Right.retrieveData() > dist_thresh && Left.retrieveData() < dist_thresh) { // obstacle on left side, turn right & then forward
-      LeftWheel.turnRight();
-      RightWheel.turnRight();
+      LeftWheel.moveRight();
+      RightWheel.moveRight();
       delay(500);
       LeftWheel.moveForward();
       RightWheel.moveForward();
@@ -119,8 +119,8 @@ void robot::solveMaze() {
       // delay(100);
     }
     else if (Front.retrieveData() > dist_thresh && Right.retrieveData() < dist_thresh && Left.retrieveData() > dist_thresh) { // obstacle on right side, turn left & then forward 
-      LeftWheel.turnLeft();
-      RightWheel.turnLeft();
+      LeftWheel.moveLeft();
+      RightWheel.moveLeft();
       delay(500);
       LeftWheel.moveForward();
       RightWheel.moveForward();
