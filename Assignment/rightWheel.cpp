@@ -18,25 +18,25 @@ void rightWheel::moveForward() {
   digitalWrite(right_dir_2, LOW);
 }
 
-void rightWheel::reverse() {
+void rightWheel::moveReverse() {
   digitalWrite(right_pwm, HIGH);
   digitalWrite(right_dir_1, LOW);
   digitalWrite(right_dir_2, HIGH);
 }
 
-void rightWheel::stop() {
+void rightWheel::moveStop() {
+  digitalWrite(right_pwm, LOW);
+  digitalWrite(right_dir_1, HIGH);
+  digitalWrite(right_dir_2, LOW);
+}
+
+void rightWheel::moveLeft() {
   digitalWrite(right_pwm, HIGH);
   digitalWrite(right_dir_1, HIGH);
   digitalWrite(right_dir_2, LOW);
 }
 
-void rightWheel::turnLeft() {
-  digitalWrite(right_pwm, HIGH);
-  digitalWrite(right_dir_1, HIGH);
-  digitalWrite(right_dir_2, LOW);
-}
-
-void rightWheel::turnRight() {
+void rightWheel::moveRight() {
   digitalWrite(right_pwm, HIGH);
   digitalWrite(right_dir_1, LOW);
   digitalWrite(right_dir_2, HIGH);

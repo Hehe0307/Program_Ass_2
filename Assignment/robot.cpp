@@ -12,28 +12,28 @@ robot::robot(ultrasonic f, ultrasonic r, ultrasonic l, leftWheel lw, rightWheel 
 void robot::testFunctions() {
   // Wheel Function Test
   Serial.println("Forward");
-  LeftWheel.moveForward()
+  LeftWheel.moveForward();
   RightWheel.moveForward();
   delay(2000);
 
   Serial.println("Left");
-  LeftWheel.turnLeft();
-  RightWheel.turnLeft();
+  LeftWheel.moveLeft();
+  RightWheel.moveLeft();
   delay(2000);
   
   Serial.println("Right");
-  LeftWheel.turnRight();
-  RightWheel.turnRight();
+  LeftWheel.moveRight();
+  RightWheel.moveRight();
   delay(2000);
 
   Serial.println("Reverse");
-  LeftWheel.reverse();
-  RightWheel.reverse();
+  LeftWheel.moveReverse();
+  RightWheel.moveReverse();
   delay(2000);
 
   Serial.println("Stop");
-  LeftWheel.stop();
-  RightWheel.stop();
+  LeftWheel.moveStop();
+  RightWheel.moveStop();
   delay(2000);
 
   // Ultrasonic Sensor Test

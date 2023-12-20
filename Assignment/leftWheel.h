@@ -8,10 +8,10 @@ class leftWheel : public wheel
     leftWheel(int, int, int); // Constructor
     void declarePin(); // For pin declaration
     void moveForward(); // For forward movmement
-    void reverse(); // For backward movement 
+    void moveReverse(); // For backward movement 
     void moveLeft(); // For turn left movmement
     void moveRight(); // For turn right movement 
-    void stop(); // For stopping robot movement
+    void moveStop(); // For stopping robot movement
   private:
     int left_pwm; // PWM Pin
     int left_dir_1; // Direction Pin 1
