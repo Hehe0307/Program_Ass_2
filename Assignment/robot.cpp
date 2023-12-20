@@ -9,6 +9,47 @@
 robot::robot(ultrasonic f, ultrasonic r, ultrasonic l, leftWheel lw, rightWheel rw) 
 : Front(f), Right(r), Left(l), LeftWheel(lw), RightWheel(rw) {}
 
+void robot::testFunctions() {
+  // Wheel Function Test
+  Serial.println("Forward");
+  LeftWheel.moveForward()
+  RightWheel.moveForward();
+  delay(2000);
+
+  Serial.println("Left");
+  LeftWheel.turnLeft();
+  RightWheel.turnLeft();
+  delay(2000);
+  
+  Serial.println("Right");
+  LeftWheel.turnRight();
+  RightWheel.turnRight();
+  delay(2000);
+
+  Serial.println("Reverse");
+  LeftWheel.reverse();
+  RightWheel.reverse();
+  delay(2000);
+
+  Serial.println("Stop");
+  LeftWheel.stop();
+  RightWheel.stop();
+  delay(2000);
+
+  // Ultrasonic Sensor Test
+  Serial.print("Front Sensor: ");
+  Serial.println(Front.retrieveData());
+  delay(1000);
+
+  Serial.print("Right Sensor: ");
+  Serial.println(Right.retrieveData());
+  delay(1000);
+
+  Serial.print("Left Sensor: ");
+  Serial.println(Left.retrieveData());
+  delay(1000);
+}
+
 void robot::solveMaze() {
   const int dist_thresh = 5;
   while (true) {
@@ -94,4 +135,3 @@ void robot::solveMaze() {
     }
   }
 }
-
