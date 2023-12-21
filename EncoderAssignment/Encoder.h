@@ -6,16 +6,11 @@ class Encoder {
     Encoder(int);
     void declarePin();
     void calculate();
-    static volatile int pulse;
-    static volatile unsigned int debounce;
-  private:
+    double value = 0;
     int interruptPin;
+  private:
     const int wheelDiameter = 47;
-    const int diskPulse = 20;
-    unsigned int oldTime = 0;
-    unsigned int rpm = 0;
-    float velocity = 0;
-    int input;
+    const int pulsePerGrid = 24;
 };
 
 #endif

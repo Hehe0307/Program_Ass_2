@@ -2,22 +2,57 @@
 #include "constant.h"
 #include "encoder.h"
 
-Encoder leftEncoder(LEFT_PIN);
+#include <TimedAction.h>
 
-void counter() {
-  if(digitalRead(LEFT_PIN) && (micros() - leftEncoder.debounce > 500) && digitalRead(LEFT_PIN)) { 
-  leftEncoder.debounce = micros();
-  leftEncoder.pulse++;
-  }
+void GetLeftPulseTaskCode();
+void GetRightPulseTaskCode();
+TimedAction GetLeftPulseTask = TimedAction(100000, GetLeftPulseTaskCode);
+TimedAction GetRightPulseTask = TimedAction(100000, GetRightPulseTaskCode);
+Encoder leftEncoder(2);
+Encoder rightEncoder(3);
+volatile uint32_t leftPulse = 0;
+volatile uint32_t rightPulse = 0;
+
+void GetLeftPulseTaskCode()
+{
+  cli();
+  sei();
 }
+
+void GetRightPulseTaskCode()
+{
+  cli();
+  sei();
+}
+
+void leftCounter()
+{
+    leftPulse++;
+}
+
+void rightCounter()
+{
+  rightPulse++;
+}
+
+
 
 void setup() {
   Serial.begin(9600);
-  leftEncoder.declarePin();
-  attachInterrupt(0, counter, RISING);
+  attachInterrupt(digitalPinToInterrupt(2), leftCounter, RISING);
+  attachInterrupt(digitalPinToInterrupt(3), rightCounter, RISING);
+  GetLeftPulseTask.enable();
+  GetRightPulseTask.enable();
 }
 
 void loop() {
-  leftEncoder.calculate();
-  counter();
+  Serial.print("Left Encoder Pulse: ");
+  Serial.print(leftPulse);
+  Serial.print("    ");
+  Serial.print("Right Encoder Pulse:");
+  Serial.print(rightPulse);
+  Serial.println();
+  
+  GetLeftPulseTask.check();
+  GetRightPulseTask.check();
 }
