@@ -1,2 +1,2 @@
-#define LEFT_ENC 2
-// #define RIGHT_ENC 3
+#define LEFT_PIN 2
+#define RIGHT_PIN 3
