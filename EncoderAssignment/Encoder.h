@@ -10,8 +10,7 @@ class Encoder {
     static volatile unsigned int debounce;
   private:
     int interruptPin;
-    const int wheelDiameter = 47;
-    const int diskPulse = 20;
+    int diskPulse = 0;
     unsigned int oldTime = 0;
     unsigned int rpm = 0;
     float velocity = 0;

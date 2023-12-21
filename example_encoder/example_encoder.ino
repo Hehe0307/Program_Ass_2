@@ -22,10 +22,10 @@ void setup(){
 }
 //// Main Program ///////////////////////////////////////////////////////////////////////
 void loop(){
-   if (millis() - timeold >= 1000){  // Update every second
+   if (millis() - timeold = 1000){  // Update every second
       noInterrupts(); // Don't process interrupts during calculations // Turn off interrupt processing to perform calculations.
-      rpm = (60 * 1000 / pulsesperturn )/ (millis() - timeold)* pulses; // Calculate revolutions per minute
-      velocity = rpm * 3.1416 * wheel_diameter * 60 / 1000000; // Calculate velocity in [Km/h] 
+      rpm = (pulses/20)/60000; // Calculate revolutions per minute
+      velocity = rpm * 3.1416 * wheel_diameter / 60000; // Calculate velocity in [m/s] 
       timeold = millis(); // Store the current time.
       Serial.print(millis()/1000); Serial.print("       ");// Send time value, RPM, and pulses to the serial port.
       Serial.print(rpm,DEC); Serial.print("   ");

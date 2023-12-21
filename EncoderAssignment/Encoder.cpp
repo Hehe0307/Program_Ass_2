@@ -8,18 +8,19 @@ void Encoder::declarePin() {
 }
 
 void Encoder::calculate() {
-  if (millis() - oldTime >= 1000) {
-    noInterrupts(); 
-    rpm = (60 * 1000 / diskPulse ) / (millis() - oldTime) * pulse; 
-    velocity = rpm * 3.1416 * wheelDiameter * 60 / 1000000; 
-    oldTime = millis();
-    Serial.print(millis() / 1000); Serial.print("       ");
-    Serial.print(rpm, DEC); Serial.print("   ");
-    Serial.print(pulse, DEC); Serial.print("     ");
-    Serial.println(velocity, 2); 
-    pulse = 0;
-    interrupts();
-  }
+  if (millis() - oldTime == 1000) // Update every second
+  {  
+      noInterrupts(); // Don't process interrupts during calculations // Turn off interrupt processing to perform calculations.
+      rpm = (diskPulse/20)/60000; // Calculate revolutions per minute
+      velocity = rpm * 3.1416 * 47 / 60000; // Calculate velocity in [m/s] 
+      oldTime = millis(); // Store the current time.
+      Serial.print(millis()/1000); Serial.print("       ");// Send time value, RPM, and pulses to the serial port.
+      Serial.print(rpm,DEC); Serial.print("   ");
+      Serial.print(diskPulse,DEC); Serial.print("     ");
+      Serial.println(velocity,2); 
+      diskPulse = 0;  // Initialize pulses.
+      interrupts(); // Restart the interrupt processing // Restart interrupt processing
+   }
 }
 
 volatile int Encoder::pulse = 0;
