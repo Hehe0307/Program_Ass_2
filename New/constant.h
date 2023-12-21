@@ -13,5 +13,12 @@
 #define LEFT_TRIG 10
 #define LEFT_ECHO 11
 
-#define LEFT_PIN 2
-#define RIGHT_PIN 3
+const int dist_thresh = 15;
+
+enum {
+  FORWARD,
+  LEFT,
+  RIGHT,
+  REVERSE,
+  STOP
+} direction;
