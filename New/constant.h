@@ -13,7 +13,7 @@
 #define LEFT_TRIG 10
 #define LEFT_ECHO 11
 
-const int dist_thresh = 15;
+const int dist_thresh = 7;
 
 enum {
   FORWARD,

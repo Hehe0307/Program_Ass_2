@@ -9,6 +9,24 @@ leftWheel::leftWheel(const int left_pwm, const int left_dir_1, const int left_di
 void leftWheel::declarePin() {
   wheel::wheel(left_pwm, left_dir_1, left_dir_2);
 }
+
+void leftWheel::moveForward() {
+  digitalWrite(left_pwm, HIGH);
+  digitalWrite(left_dir_1, HIGH);
+  digitalWrite(left_dir_2, LOW);
+}
+
+void leftWheel::moveReverse() {
+  digitalWrite(left_pwm, HIGH);
+  digitalWrite(left_dir_1, LOW);
+  digitalWrite(left_dir_2, HIGH);
+}
+
+void leftWheel::moveStop() {
+  digitalWrite(left_pwm, LOW);
+  digitalWrite(left_dir_1, HIGH);
+  digitalWrite(left_dir_2, LOW);
+}
  
 void leftWheel::moveLeft() {
   digitalWrite(left_pwm, HIGH);

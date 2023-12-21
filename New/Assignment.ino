@@ -15,44 +15,50 @@ ultrasonic rightSensor(RIGHT_TRIG, RIGHT_ECHO);
 ultrasonic leftSensor(LEFT_TRIG, LEFT_ECHO);
 robot myRobot(frontSensor, rightSensor, leftSensor, leftWheelObj, rightWheelObj);
 
-// void checkMovementCode() {
-//   frontData = frontSensor.retrieveData();
-//   leftData = leftSensor.retrieveData();
-//   rightData = rightSensor.retrieveData();
+void checkMovementCode();
+void executeMovementCode();
 
-//   if(frontData < dist_thresh && rightData < dist_thresh && leftData < dist_thresh) { direction = REVERSE; } // dead end
-//   else if(frontData > dist_thresh && rightData < dist_thresh && leftData < dist_thresh) { direction = FORWARD; } // obstacle at left & right
-//   else if(frontData < dist_thresh && rightData < dist_thresh && leftData > dist_thresh) { direction = LEFT; } // obstacle at front & right
-//   else if(frontData > dist_thresh && rightData > dist_thresh && leftData > dist_thresh) { direction = RIGHT; } // obstacle at front & left
-//   else if(frontData > dist_thresh && rightData > dist_thresh && leftData > dist_thresh) { direction = LEFT; } // obstacle at front
-//   else if(frontData > dist_thresh && rightData > dist_thresh && leftData > dist_thresh) { direction = FORWARD; } // obstacle at left
-//   else if(frontData > dist_thresh && rightData > dist_thresh && leftData > dist_thresh) { direction = FORWARD; } // obstacle at right
-//   else { direction = FORWARD; } // no obstacle ahead 
-// }
+TimedAction checkMovement = TimedAction(10, checkMovementCode);
+TimedAction executeMovement = TimedAction(10, executeMovementCode);
 
-// void executeMovementCode() {
-//   switch(direction) {
-//     case FORWARD: {
-//       leftWheelObj.moveForward();
-//       rightWheelObj.moveForward();
-//     }
-//     case LEFT: {
-//       LeftWheel.moveLeft();
-//       RightWheel.moveLeft();
-//     }
-//     case RIGHT: {
-//       LeftWheel.moveRight();
-//       RightWheel.moveRight();
-//     }
-//     case REVERSE: {
-//       LeftWheel.moveReverse();
-//       RightWheel.moveReverse();
-//     }
-//     default:
-//       LeftWheel.moveStop();
-//       RightWheel.moveStop();
-//   }
-// }
+void checkMovementCode() {
+  long frontData = frontSensor.retrieveData();
+  long leftData = leftSensor.retrieveData();
+  long rightData = rightSensor.retrieveData();
+
+  if(frontData < dist_thresh && rightData < dist_thresh && leftData < dist_thresh) { direction = REVERSE; } // dead end
+  else if(frontData > dist_thresh && rightData < dist_thresh && leftData < dist_thresh) { direction = FORWARD; } // obstacle at left & right
+  else if(frontData < dist_thresh && rightData < dist_thresh && leftData > dist_thresh) { direction = LEFT; } // obstacle at front & right
+  else if(frontData > dist_thresh && rightData > dist_thresh && leftData > dist_thresh) { direction = RIGHT; } // obstacle at front & left
+  else if(frontData > dist_thresh && rightData > dist_thresh && leftData > dist_thresh) { direction = LEFT; } // obstacle at front
+  else if(frontData > dist_thresh && rightData > dist_thresh && leftData > dist_thresh) { direction = FORWARD; } // obstacle at left
+  else if(frontData > dist_thresh && rightData > dist_thresh && leftData > dist_thresh) { direction = FORWARD; } // obstacle at right
+  else { direction = FORWARD; } // no obstacle ahead 
+}
+
+void executeMovementCode() {
+  switch(direction) {
+    case FORWARD: {
+      leftWheelObj.moveForward();
+      rightWheelObj.moveForward();
+    }
+    case LEFT: {
+      leftWheelObj.moveLeft();
+      rightWheelObj.moveLeft();
+    }
+    case RIGHT: {
+      leftWheelObj.moveRight();
+      rightWheelObj.moveRight();
+    }
+    case REVERSE: {
+      leftWheelObj.moveReverse();
+      rightWheelObj.moveReverse();
+    }
+    default:
+      leftWheelObj.moveStop();
+      rightWheelObj.moveStop();
+  }
+}
 
 void setup() { 
   Serial.begin(115200);
@@ -61,11 +67,13 @@ void setup() {
   frontSensor.declarePin();
   rightSensor.declarePin();
   leftSensor.declarePin();
-  checkMovement.enable();
-  executeMovement.enable();
+  // checkMovement.enable();
+  // executeMovement.enable();
 }
 
 void loop() {
-  checkMovement.check();
-  executeMovement.check();
+  // myRobot.testFunctions();
+  myRobot.solveMaze();
+  // checkMovement.check();
+  // executeMovement.check();
 }

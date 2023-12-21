@@ -53,21 +53,22 @@ void robot::testFunctions() {
 }
 
 void robot::solveMaze() {
-  frontData = Front.retrieveData(); 
-  leftData = Left.retrieveData();
-  rightData = Right.retrieveData();
-
   while (true) {
-    if ( frontData > dist_thresh && rightData < dist_thresh && leftData < dist_thresh) { // left & right have obstacles but front is clear
+    frontData = Front.retrieveData(); 
+    leftData = Left.retrieveData();
+    rightData = Right.retrieveData();
+    Serial.print(Front.retrieveData()); Serial.print("     "); Serial.print(Left.retrieveData()); Serial.print("     "); Serial.println(Right.retrieveData());
+    if (frontData > dist_thresh && rightData < dist_thresh && leftData < dist_thresh) { // left & right have obstacles but front is clear
       LeftWheel.moveForward();
       RightWheel.moveForward(); 
-      // Serial.println("Forward");
-      // delay(100);
+      Serial.println("left & right have obstacles but front is clear");
+      Serial.println("Forward");
     }
-    else if ( frontData < dist_thresh && rightData < dist_thresh && leftData < dist_thresh) { // obstacle infront of all 3 sides, reverse
+    else if (frontData < dist_thresh && rightData < dist_thresh && leftData < dist_thresh) { // obstacle infront of all 3 sides, reverse
       LeftWheel.moveReverse();
       RightWheel.moveReverse();
-      // Serial.println("Reverse");
+      Serial.println("obstacle infront of all 3 sides");
+      Serial.println("Reverse");
       delay(500);
       if((leftData) > (rightData)) { 
         LeftWheel.moveLeft();
@@ -85,45 +86,53 @@ void robot::solveMaze() {
     else if (frontData < dist_thresh && rightData < dist_thresh && leftData > dist_thresh) { // obstacle on right and front sides, turn left side 
       LeftWheel.moveLeft(); 
       RightWheel.moveLeft(); 
-      // Serial.println("Left");
-      // delay(100);
+      Serial.println("obstacle on right and front sides, turn left side");
+      Serial.println("Left");
     }
     else if (frontData < dist_thresh && rightData > dist_thresh && leftData < dist_thresh) { // obstacle on left and front sides, turn right side
       LeftWheel.moveRight();
       RightWheel.moveRight();
-      // Serial.println("Right");
-      // delay(100);
+      Serial.println("obstacle on left and front sides, turn right side");
+      Serial.println("Right");
     }
     else  if (frontData < dist_thresh && rightData > dist_thresh && leftData > dist_thresh) { // obstacle on front side, turn left & then forward
       LeftWheel.moveLeft();
       LeftWheel.moveLeft(); 
-      delay(500); 
-      LeftWheel.moveForward();
-      RightWheel.moveForward();
+      Serial.println("obstacle on front side");
+      Serial.println("Left");
+      // delay(500); 
+      // LeftWheel.moveForward();
+      // RightWheel.moveForward();
       // Serial.println("Left then Forward"); 
       // delay(100);
     }
     else if (frontData > dist_thresh && rightData > dist_thresh && leftData < dist_thresh) { // obstacle on left side, turn right & then forward
-      LeftWheel.moveRight();
-      RightWheel.moveRight();
-      delay(500);
       LeftWheel.moveForward();
       RightWheel.moveForward();
+      Serial.println("obstacle on left side");
+      Serial.println("Forward");
+      // delay(500);
+      // LeftWheel.moveForward();
+      // RightWheel.moveForward();
       // Serial.println("Right then Forward");
       // delay(100);
     }
     else if (frontData > dist_thresh && rightData < dist_thresh && leftData > dist_thresh) { // obstacle on right side, turn left & then forward 
-      LeftWheel.moveLeft();
-      RightWheel.moveLeft();
-      delay(500);
       LeftWheel.moveForward();
       RightWheel.moveForward();
+      Serial.println("obstacle on right side");
+      Serial.println("Forward");
+      // delay(500);
+      // LeftWheel.moveForward();
+      // RightWheel.moveForward();
       // Serial.println("Left then Forward");
       // delay(100);
     }
     else { // no obstacle ahead
       LeftWheel.moveForward();
       RightWheel.moveForward();
+      Serial.println("Clear");
+      Serial.println("Forward");
       // Serial.println("Forward");
       // delay(100);
     }

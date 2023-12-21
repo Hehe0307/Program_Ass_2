@@ -15,6 +15,9 @@ class robot
     ultrasonic Left; // Left HC-SR04 sensor
     leftWheel LeftWheel; 
     rightWheel RightWheel; 
+    long frontData = 0;
+    long leftData = 0;
+    long rightData = 0;
 };
 
 #endif

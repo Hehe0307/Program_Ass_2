@@ -8,9 +8,9 @@ class wheel
     wheel();
     wheel(int wheel_pwm, int wheel_dir_1, int wheel_dir_2); // Constructor
     virtual void declarePin(); // For pin declaration
-    void moveForward(); // For forward movmement
-    void moveReverse(); // For backward movement 
-    void moveStop(); // For stopping robot movement
+    virtual void moveForward(); // For forward movmement
+    virtual void moveReverse(); // For backward movement 
+    virtual void moveStop(); // For stopping robot movement
     virtual void moveLeft() = 0; // For turn left movmement
     virtual void moveRight() = 0; // For turn right movement 
   private:
