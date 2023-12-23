@@ -7,7 +7,9 @@ class robot
   public:
     robot(ultrasonic, ultrasonic, ultrasonic, leftWheel, rightWheel); // Constructor
     void testFunctions();
+    void solveMaze();
     void initializeMaze();
+    int Maze[12][12] = { 0 }; // Initiallize the maze with 0's
   private:
     // Robot 'has a' Front, Right, Left, LeftWheel, RightWheel (Composition)
     ultrasonic Front; // Front HC-SR04 sensor
@@ -15,7 +17,6 @@ class robot
     ultrasonic Left; // Left HC-SR04 sensor
     leftWheel LeftWheel; 
     rightWheel RightWheel; 
-    int Maze[12][12] = { 0 }; // Initiallize the maze with 0's
 };
 
 #endif

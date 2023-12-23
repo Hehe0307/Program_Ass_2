@@ -18,7 +18,7 @@
 
 #define DIST_THRESH 7;
 #define PULSE_PER_GRID 24;
-#define TASK_INTERVAL 100000;
+#define TASK_INTERVAL 100;
 
 enum {
   FORWARD,
