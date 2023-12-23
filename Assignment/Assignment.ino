@@ -37,30 +37,32 @@ void rightCounter() { rightPulse++; }
 
 void updateMazeCode() {
   switch(movement) {
-    case FORWARD:
-      switch (direction)
+    case FORWARD: {
+      switch(direction) {
         case NORTH:
-          if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row--; break; }
+          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row--; break; } }
         case SOUTH:
-          if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row++; break; }
+          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row++; break; } }
         case WEST:
-          if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col--; break; }
+          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col--; break; } }
         case EAST:
-          if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col++; break; }
+          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col++; break; } }
+      }
+    }
     case LEFT:
     case RIGHT:
     case REVERSE:
-      leftPulse = 0; rightPulse = 0; break;
+      { leftPulse = 0; rightPulse = 0; break; }
   }
   Serial.print(row); Serial.print("     "); Serial.println(col); 
 }
 
 void checkMovementCode() {
   long frontData = frontSensor.retrieveData();
-  long leftData = leftSensor.retrieveData();
   long rightData = rightSensor.retrieveData();
-
-  if(frontData < DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { movement = REVERSE; } // dead end
+  long leftData = leftSensor.retrieveData();
+  
+  if(frontData < DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { movement = REVERSE; myRobot.Maze[row][col] = 1; } // dead end
   else if(frontData > DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { movement = FORWARD; } // obstacle at left & right
   else if(frontData < DIST_THRESH && rightData < DIST_THRESH && leftData > DIST_THRESH) { movement = LEFT; } // obstacle at front & right
   else if(frontData > DIST_THRESH && rightData > DIST_THRESH && leftData > DIST_THRESH) { movement = RIGHT; } // obstacle at front & left
@@ -111,6 +113,7 @@ void setup() {
   leftSensor.declarePin();
   pinMode(digitalPinToInterrupt(LEFT_ENC), INPUT);
   pinMode(digitalPinToInterrupt(RIGHT_ENC), INPUT);
+
   GetLeftPulseTask.enable();
   GetRightPulseTask.enable();
   checkMovement.enable();
