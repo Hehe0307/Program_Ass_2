@@ -35,18 +35,29 @@ void GetRightPulseTaskCode() { cli(); sei(); }
 void leftCounter() { leftPulse++; }
 void rightCounter() { rightPulse++; }
 
+void process() {
+  for(int i = 0; i < row; i++) {
+    for(int j = 0; j < col) {
+      if(visited[i][j] == 0) { return visited[i][j]; }
+      else {
+        
+      }
+    }
+  }
+}
+
 void updateMazeCode() {
   switch(movement) {
     case FORWARD: {
       switch(direction) {
         case NORTH:
-          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row--; break; } }
+          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row--; myRobot.visited[row][col] = 1; break; } }
         case SOUTH:
-          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row++; break; } }
+          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row++; myRobot.visited[row][col] = 1; break; } }
         case WEST:
-          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col--; break; } }
+          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col--; myRobot.visited[row][col] = 1; break; } }
         case EAST:
-          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col++; break; } }
+          { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col++; myRobot.visited[row][col] = 1; break; } }
       }
     }
     case LEFT:

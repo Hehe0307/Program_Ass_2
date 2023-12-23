@@ -35,8 +35,6 @@ void rightCounter()
   rightPulse++;
 }
 
-
-
 void setup() {
   Serial.begin(9600);
   attachInterrupt(digitalPinToInterrupt(2), leftCounter, RISING);
