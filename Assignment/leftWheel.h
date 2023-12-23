@@ -7,10 +7,10 @@ class leftWheel : public wheel
   public:
     leftWheel(const int, const int, const int); // Constructor
     void declarePin(); // For pin declaration
-    void moveForward(); // For forward movmement
-    void moveReverse(); // For backward movement 
     void moveLeft(); // For turn left movmement
     void moveRight(); // For turn right movement 
+    void moveForward(); // For forward movmement
+    void moveReverse(); // For backward movement 
     void moveStop(); // For stopping robot movement
   private:
     const int left_pwm; // PWM Pin

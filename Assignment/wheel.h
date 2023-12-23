@@ -2,15 +2,21 @@
 #define WHEEL_H_INCLUDED
 
 // Interface abstract class of 'wheel'
-struct wheel
+class wheel
 {
-    wheel(); // Constructor
-    virtual void declarePin() = 0; // For pin declaration
-    virtual void moveForward() = 0; // For forward movmement
-    virtual void moveReverse() = 0; // For backward movement 
+  public:
+    wheel();
+    wheel(int wheel_pwm, int wheel_dir_1, int wheel_dir_2); // Constructor
+    virtual void declarePin(); // For pin declaration
+    virtual void moveForward(); // For forward movmement
+    virtual void moveReverse(); // For backward movement 
+    virtual void moveStop(); // For stopping robot movement
     virtual void moveLeft() = 0; // For turn left movmement
     virtual void moveRight() = 0; // For turn right movement 
-    virtual void moveStop() = 0; // For stopping robot movement
+  private:
+    int wheel_pwm;
+    int wheel_dir_1;
+    int wheel_dir_2;
 };
 
 #endif // WHEEL_H_INCLUDED

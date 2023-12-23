@@ -13,5 +13,31 @@
 #define LEFT_TRIG 10
 #define LEFT_ECHO 11
 
-#define LEFT_PIN 2
-#define RIGHT_PIN 3
+#define LEFT_ENC 2
+#define RIGHT_ENC 3
+
+#define DIST_THRESH 7;
+#define PULSE_PER_GRID 24;
+#define TASK_INTERVAL 100000;
+
+enum {
+  FORWARD,
+  LEFT,
+  RIGHT,
+  REVERSE,
+  STOP
+} movement;
+
+enum {
+  NORTH,
+  SOUTH,
+  EAST,
+  WEST
+} direction;
+
+enum {
+  PATH, 
+  WALL, 
+  START,
+  END
+} state;

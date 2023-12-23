@@ -7,9 +7,7 @@ leftWheel::leftWheel(const int left_pwm, const int left_dir_1, const int left_di
 : left_pwm(left_pwm), left_dir_1(left_dir_1), left_dir_2(left_dir_2) {}
 
 void leftWheel::declarePin() {
-  pinMode(left_pwm, OUTPUT);
-  pinMode(left_dir_1, OUTPUT);
-  pinMode(left_dir_2, OUTPUT);
+  wheel::wheel(left_pwm, left_dir_1, left_dir_2);
 }
 
 void leftWheel::moveForward() {
@@ -29,7 +27,7 @@ void leftWheel::moveStop() {
   digitalWrite(left_dir_1, HIGH);
   digitalWrite(left_dir_2, LOW);
 }
-
+ 
 void leftWheel::moveLeft() {
   digitalWrite(left_pwm, HIGH);
   digitalWrite(left_dir_1, LOW);

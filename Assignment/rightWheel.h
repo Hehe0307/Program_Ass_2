@@ -5,17 +5,17 @@
 class rightWheel : public wheel
 {
   public:
-    rightWheel(const int, const int, const int); // Constructor
+    rightWheel(const int, const int, const int); // Constructor 
     void declarePin(); // For pin declaration
-    void moveForward(); // For forward movmement
-    void moveReverse(); // For backward movement 
     void moveLeft(); // For turn left movmement
     void moveRight(); // For turn right movement 
+    void moveForward(); // For forward movmement
+    void moveReverse(); // For backward movement 
     void moveStop(); // For stopping robot movement
   private:
-    int right_pwm; // PWM Pin
-    int right_dir_1; // Direction Pin 1
-    int right_dir_2; // Direction Pin 2
+    const int right_pwm; // PWM Pin
+    const int right_dir_1; // Direction Pin 1
+    const int right_dir_2; // Direction Pin 2
 };
 
 #endif // RIGHTWHEEL_H_INCLUDED
