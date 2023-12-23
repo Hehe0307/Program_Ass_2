@@ -16,9 +16,9 @@
 #define LEFT_ENC 2
 #define RIGHT_ENC 3
 
-#define DIST_THRESH 7;
-#define PULSE_PER_GRID 24;
-#define TASK_INTERVAL 100;
+#define DIST_THRESH 7
+#define PULSE_PER_GRID 24
+#define TASK_INTERVAL 100
 
 enum {
   FORWARD,

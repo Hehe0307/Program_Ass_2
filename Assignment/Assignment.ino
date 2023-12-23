@@ -78,12 +78,24 @@ void executeMovementCode() {
       leftWheelObj.moveForward();
       rightWheelObj.moveForward();
     case LEFT: 
-      leftWheelObj.moveLeft();
-      rightWheelObj.moveLeft();
+      checkMovement.disable();
+      leftPulse = 0;
+      while( leftPulse < 10 )
+      {
+        leftWheelObj.moveLeft();
+      }
+      leftPulse = 0;
+      rightPulse = 0;
+      while( rightPulse < 10 )
+      {
+        rightWheelObj.moveLeft();
+      }
+      rightPulse = 0;
       if(direction == NORTH) { direction = WEST; }
       else if(direction == SOUTH) { direction = EAST; }
       else if(direction == WEST) { direction = SOUTH; }
       else { direction = NORTH; }
+      checkMovement.enable();
     case RIGHT:
       leftWheelObj.moveRight();
       rightWheelObj.moveRight();
