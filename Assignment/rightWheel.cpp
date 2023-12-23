@@ -29,9 +29,13 @@ void rightWheel::moveStop() {
 }
 
 void rightWheel::moveLeft() {
-  digitalWrite(right_pwm, HIGH);
-  digitalWrite(right_dir_1, HIGH);
-  digitalWrite(right_dir_2, LOW);
+  while(rightPulse <= 10)
+    {
+    digitalWrite(right_pwm, HIGH);
+    digitalWrite(right_dir_1, HIGH);
+    digitalWrite(right_dir_2, LOW);
+    }
+    rightPulse = 0;
 }
 
 void rightWheel::moveRight() {

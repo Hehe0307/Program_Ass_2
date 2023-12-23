@@ -7,6 +7,7 @@ class robot
   public:
     robot(ultrasonic, ultrasonic, ultrasonic, leftWheel, rightWheel); // Constructor
     void testFunctions();
+    void solveMaze();
     void initializeMaze();
   private:
     // Robot 'has a' Front, Right, Left, LeftWheel, RightWheel (Composition)
