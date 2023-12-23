@@ -22,9 +22,9 @@ void updateMazeCode();
 
 TimedAction GetLeftPulseTask = TimedAction(TASK_INTERVAL, GetLeftPulseTaskCode);
 TimedAction GetRightPulseTask = TimedAction(TASK_INTERVAL, GetRightPulseTaskCode);
-TimedAction checkMovement = TimedAction(10, checkMovementCode);
-TimedAction executeMovement = TimedAction(10, executeMovementCode);
-TimedAction updateMaze = TimedAction(10, updateMazeCode);
+TimedAction checkMovement = TimedAction(TASK_INTERVAL, checkMovementCode);
+TimedAction executeMovement = TimedAction(TASK_INTERVAL, executeMovementCode);
+TimedAction updateMaze = TimedAction(TASK_INTERVAL, updateMazeCode);
 
 volatile uint32_t leftPulse = 0;
 volatile uint32_t rightPulse = 0;
@@ -52,7 +52,7 @@ void updateMazeCode() {
     case LEFT:
     case RIGHT:
     case REVERSE:
-      { leftPulse = 0; rightPulse = 0; break; }
+      { break; }
   }
   Serial.print(row); Serial.print("     "); Serial.println(col); 
 }
@@ -62,7 +62,7 @@ void checkMovementCode() {
   long rightData = rightSensor.retrieveData();
   long leftData = leftSensor.retrieveData();
   
-  if(frontData < DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { movement = REVERSE; myRobot.Maze[row][col] = 1; } // dead end
+  if(frontData < DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { movement = REVERSE; myRobot.Maze[row][col] = WALL; } // dead end
   else if(frontData > DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { movement = FORWARD; } // obstacle at left & right
   else if(frontData < DIST_THRESH && rightData < DIST_THRESH && leftData > DIST_THRESH) { movement = LEFT; } // obstacle at front & right
   else if(frontData > DIST_THRESH && rightData > DIST_THRESH && leftData > DIST_THRESH) { movement = RIGHT; } // obstacle at front & left
@@ -73,34 +73,45 @@ void checkMovementCode() {
 }
 
 void executeMovementCode() {
-  switch(movement) {
-    case FORWARD:
-      leftWheelObj.moveForward();
-      rightWheelObj.moveForward();
-    case LEFT: 
-      leftWheelObj.moveLeft();
-      rightWheelObj.moveLeft();
-      if(direction == NORTH) { direction = WEST; }
-      else if(direction == SOUTH) { direction = EAST; }
-      else if(direction == WEST) { direction = SOUTH; }
-      else { direction = NORTH; }
-    case RIGHT:
-      leftWheelObj.moveRight();
-      rightWheelObj.moveRight();
-      if(direction == NORTH) { direction = EAST; }
-      else if(direction == SOUTH) { direction = WEST; }
-      else if(direction == WEST) { direction = NORTH; }
-      else { direction = SOUTH; }
-    case REVERSE: 
-      leftWheelObj.moveReverse();
-      rightWheelObj.moveReverse();
-      if(direction == NORTH) { direction = SOUTH; }
-      else if(direction == SOUTH) { direction = NORTH; }
-      else if(direction == WEST) { direction = EAST; }
-      else { direction = WEST; }
-    default:
-      leftWheelObj.moveStop();
-      rightWheelObj.moveStop();
+  if(myRobot.Maze[row][col] != WALL && myRobot.Maze[row][col] != START && myRobot.Maze[row][col] != END) {
+    switch(movement) {
+      case FORWARD:
+        leftWheelObj.moveForward();
+        rightWheelObj.moveForward();
+        break;
+      case LEFT: 
+        leftWheelObj.moveLeft();
+        rightWheelObj.moveLeft();
+        if(direction == NORTH) { direction = WEST; }
+        else if(direction == SOUTH) { direction = EAST; }
+        else if(direction == WEST) { direction = SOUTH; }
+        else { direction = NORTH; }
+        break;
+      case RIGHT:
+        leftWheelObj.moveRight();
+        rightWheelObj.moveRight();
+        if(direction == NORTH) { direction = EAST; }
+        else if(direction == SOUTH) { direction = WEST; }
+        else if(direction == WEST) { direction = NORTH; }
+        else { direction = SOUTH; }
+        break;
+      case REVERSE: 
+        leftWheelObj.moveReverse();
+        rightWheelObj.moveReverse();
+        if(direction == NORTH) { direction = SOUTH; }
+        else if(direction == SOUTH) { direction = NORTH; }
+        else if(direction == WEST) { direction = EAST; }
+        else { direction = WEST; }
+        break;
+      default:
+        leftWheelObj.moveStop();
+        rightWheelObj.moveStop();
+        break;
+    }
+  }
+  if(myRobot.Maze[row][col] == END) {
+    leftWheelObj.moveStop();
+    rightWheelObj.moveStop();
   }
 }
 

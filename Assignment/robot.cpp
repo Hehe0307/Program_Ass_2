@@ -5,7 +5,6 @@
 #include "robot.h"
 #include "Arduino.h"
 #include "constant.h"
-#include "variable.h"
 
 // Implementation of 'robot' class
 robot::robot(ultrasonic f, ultrasonic r, ultrasonic l, leftWheel lw, rightWheel rw) 

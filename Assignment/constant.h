@@ -16,9 +16,9 @@
 #define LEFT_ENC 2
 #define RIGHT_ENC 3
 
-#define DIST_THRESH 7;
-#define PULSE_PER_GRID 24;
-#define TASK_INTERVAL 100;
+#define DIST_THRESH 7
+#define PULSE_PER_GRID 24
+#define TASK_INTERVAL 100
 
 enum {
   FORWARD,
@@ -35,9 +35,7 @@ enum {
   WEST
 } direction;
 
-enum {
-  PATH, 
-  WALL, 
-  START,
-  END
-} state;
+#define PATH 0
+#define WALL 1
+#define START 2
+#define END 3 
