@@ -1,0 +1,103 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+#include <iomanip>
+
+using namespace std;
+
+const int ROWS = 12;
+const int COLS = 12;
+
+int maze[ROWS][COLS] = {
+{1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1},
+{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+{1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1},
+{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+{1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1},
+{1, 0, 0, 0, 0, 3, 3, 0, 0, 0, 0, 1},
+{1, 0, 1, 0, 1, 3, 3, 0, 1, 0, 0, 1},
+{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+{1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 1},
+{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+{1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1},
+{1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}
+};
+
+//Print maze
+void printMaze()
+{
+    for(int i = 0; i < ROWS; i++)
+    {
+    for(int j = 0; j < COLS; j++)
+    {
+        cout << maze[i][j] << "  ";
+    }
+    cout << endl;
+    }
+    cout << endl;
+}
+
+bool isValid(int r, int c) {
+    return r >= 0 && r < ROWS && c >= 0 && c < COLS && maze[r][c] != 1;
+}
+
+
+int main(){
+
+//Initial maze
+printMaze();
+
+//Ptioritise right
+//up, down, right, left
+int dr[4] = {-1, 1, 0, 0};
+int dc[4] = {0, 0, 1, -1};
+
+    int direction = -1;
+
+    //Tremaux algorithm
+    srand(static_cast<unsigned int>(time(nullptr)));
+
+    // Start exploring maze[11][1]
+    int r = 11;
+    int c = 1;
+
+    // Explore until reaching the center
+    while (maze[r][c] != 3) {
+        // Mark the current cell
+        maze[r][c]++;
+
+     // Choose the next direction
+        int nextDir = -1;
+        for (int i = 0; i < 4; ++i) {
+            int newR = r + dr[i];
+            int newC = c + dc[i];
+
+            if (isValid(newR, newC) && maze[newR][newC] == 0 && maze[newR][newC] != 3) {
+                nextDir = i;
+                break;
+            }
+        }
+
+        // If there's a valid direction, move to the next cell
+        if (nextDir != -1) {
+
+            maze[r][c] = 2;
+            printMaze();
+
+            r += dr[nextDir];
+            c += dc[nextDir];
+
+            // Update the direction for backtracking
+            direction = nextDir;
+
+        } else {
+            // If there's no valid direction, backtrack
+            r -= dr[direction];
+            c -= dc[direction];
+
+            // Mark the backtracked path
+            maze[r][c]++;
+        }
+}
+    return 0;
+}
