@@ -37,6 +37,8 @@ void rightCounter()
 
 void setup() {
   Serial.begin(9600);
+  pinMode(2, INPUT);
+  pinMode(3, INPUT);
   attachInterrupt(digitalPinToInterrupt(2), leftCounter, RISING);
   attachInterrupt(digitalPinToInterrupt(3), rightCounter, RISING);
   GetLeftPulseTask.enable();
