@@ -11,7 +11,7 @@ class robot
     void initializeMaze();
     void initialNewMaze();
     int Maze[12][12] = { 0 }; // Initiallize the maze with 0's
-    bool visited[12][12] = { false; }; // 0 as not visited, 1 as visited
+    bool visited[12][12] = { false }; // 0 as not visited, 1 as visited
   private:
     // Robot 'has a' Front, Right, Left, LeftWheel, RightWheel (Composition)
     ultrasonic Front; // Front HC-SR04 sensor

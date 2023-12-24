@@ -83,7 +83,7 @@ void executeMovementCode() {
         checkMovement.disable();
         leftPulse = 0;
         rightPulse = 0;
-        while{leftPulse < 11 && rightPulse < 11) {
+        while(leftPulse < 11 && rightPulse < 11) {
           leftWheelObj.moveLeft();
           rightWheelObj.moveLeft();
         }
