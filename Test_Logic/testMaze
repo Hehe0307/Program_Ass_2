@@ -1,8 +1,4 @@
 #include <iostream>
-
-using namespace std;
-
-#include <iostream>
 #include <cstdlib>
 #include <ctime>
 #include <iomanip>
@@ -61,7 +57,7 @@ void exploreMaze()
     {
         if(Front.retrieveData() < dist_thresh)
         {
-             maze[r + 1][c] = 1;
+             maze[r - 1][c] = 1;
         }
 
         if(Right.retrieveData() < dist_thresh)

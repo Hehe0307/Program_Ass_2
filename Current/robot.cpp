@@ -124,24 +124,3 @@ void robot::initializeMaze() {
   Maze[11][0] = START;
   visited[11][0] = 1;
 }
-
-// void robot::initialNewMaze() {
-//   // Mark destination at the centre with int 'END
-//   NewMaze[12][12], NewMaze[12][13], NewMaze[13][12], NewMaze[13][13] = END;
-//   // Mark starting point at corner with int 'START'
-//   NewMaze[25][1] = START;
-//   NewVisited[25][1] = 1;
-
-//   // Initialize  the border to 1
-//   for(int i = 0; i < 26; i++) {
-//     NewMaze[i][0] = WALL;
-//     NewMaze[i][25] = WALL;
-//     NewMaze[0][i] = WALL;
-//     NewMaze[25][i] = WALL;
-
-//     NewVisited[i][0] = WALL;
-//     NewVisited[i][25] = WALL;
-//     NewVisited[0][i] = WALL;
-//     NewVisited[25][i] = WALL;
-//   }
-// }

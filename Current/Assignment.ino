@@ -38,7 +38,6 @@ void rightCounter() { rightPulse++; }
 void updateMazeCode() {
   switch(movement) {
     case FORWARD: {
-      // For Maze
       switch(direction) {
         case NORTH:
           { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row--; myRobot.visited[row][col] = 1; break; } }
@@ -49,33 +48,20 @@ void updateMazeCode() {
         case EAST:
           { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col++; myRobot.visited[row][col] = 1; break; } }
       }
-
-      // For NewMaze
-      // switch(direction) {
-      //   case NORTH:
-      //     { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row-=2; myRobot.NewVisited[row][col] = 1; break; } }
-      //   case SOUTH:
-      //     { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { row+=2; myRobot.NewVisited[row][col] = 1; break; } }
-      //   case WEST:
-      //     { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col-=2; myRobot.NewVisited[row][col] = 1; break; } }
-      //   case EAST:
-      //     { if(leftPulse == rightPulse && leftPulse % PULSE_PER_GRID == 0) { col+=2; myRobot.NewVisited[row][col] = 1; break; } }
-      // }
     }
     case LEFT:
     case RIGHT:
     case REVERSE:
       { break; }
   }
-  Serial.print(row); Serial.print("     "); Serial.println(col); 
+  Serial.print("Row: "); Serial.print(row); Serial.print("     "); Serial.print("Col: "); Serial.println(col); 
 }
 
 void checkMovementCode() {
   long frontData = frontSensor.retrieveData();
   long rightData = rightSensor.retrieveData();
   long leftData = leftSensor.retrieveData();
-  
-  // Maze
+
   if(frontData < DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { movement = REVERSE; myRobot.Maze[row][col] = WALL; } // dead end
   else if(frontData > DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { movement = FORWARD; } // obstacle at left & right
   else if(frontData < DIST_THRESH && rightData < DIST_THRESH && leftData > DIST_THRESH) { movement = LEFT; } // obstacle at front & right
@@ -84,123 +70,10 @@ void checkMovementCode() {
   else if(frontData > DIST_THRESH && rightData > DIST_THRESH && leftData > DIST_THRESH) { movement = FORWARD; } // obstacle at left
   else if(frontData > DIST_THRESH && rightData > DIST_THRESH && leftData > DIST_THRESH) { movement = FORWARD; } // obstacle at right
   else { movement = FORWARD; } // no obstacle ahead 
-
-  // NewMaze
-  // if(frontData < DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { // dead end
-  //   movement = REVERSE; 
-  //   switch(direction) {
-  //     case NORTH:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  //       myRobot.NewVisited[row][col-1] = 1;
-  //       myRobot.NewVisited[row][col+1] = 1;
-  //     case SOUTH:
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //       myRobot.NewVisited[row][col-1] = 1;
-  //       myRobot.NewVisited[row][col+1] = 1;
-  //     case EAST:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //       myRobot.NewVisited[row][col+1] = 1;
-  //     case WEST:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //       myRobot.NewVisited[row][col-1] = 1;
-  //   } 
-  // }
-  // else if(frontData > DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { // obstacle at left & right
-  //   movement = FORWARD;
-  //   switch(direction) {
-  //     case NORTH:
-  //     case SOUTH: 
-  //       myRobot.NewVisited[row][col-1] = 1;
-  //       myRobot.NewVisited[row][col+1] = 1;
-  //     case EAST:
-  //     case WEST:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //   }
-  // } 
-  // else if(frontData < DIST_THRESH && rightData < DIST_THRESH && leftData > DIST_THRESH) { // obstacle at front & right
-  //   movement = LEFT; 
-  //   switch(direction) {
-  //     case NORTH:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  //       myRobot.NewVisited[row][col+1] = 1;
-  //     case SOUTH:
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //       myRobot.NewVisited[row][col-1] = 1;
-  //     case EAST:
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //       myRobot.NewVisited[row][col+1] = 1;
-  //     case WEST:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  //       myRobot.NewVisited[row][col-1] = 1;
-  //   }
-  // }
-  // else if(frontData > DIST_THRESH && rightData > DIST_THRESH && leftData > DIST_THRESH) { // obstacle at front & left 
-  //   movement = RIGHT; 
-  //   switch(direction) {
-  //     case NORTH:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  //       myRobot.NewVisited[row][col-1] = 1;
-  //     case SOUTH:
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //       myRobot.NewVisited[row][col+1] = 1;
-  //     case EAST:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  //       myRobot.NewVisited[row][col+1] = 1;
-  //     case WEST:
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //       myRobot.NewVisited[row][col-1] = 1;
-  //   }
-  // } 
-  // else if(frontData > DIST_THRESH && rightData > DIST_THRESH && leftData > DIST_THRESH) { // obstacle at front
-  //   movement = LEFT; 
-  //   switch(direction) {
-  //     case NORTH:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  //     case SOUTH:
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //     case EAST:
-  //       myRobot.NewVisited[row][col+1] = 1;
-  //     case WEST:
-  //       myRobot.NewVisited[row][col-1] = 1;
-  //   }
-  // } 
-  // else if(frontData > DIST_THRESH && rightData > DIST_THRESH && leftData > DIST_THRESH) { // obstacle at left
-  //   movement = FORWARD;
-  //   switch(direction) {
-  //     case NORTH:
-  //       myRobot.NewVisited[row][col-1] = 1;
-  //     case SOUTH:
-  //       myRobot.NewVisited[row+1][col+1] = 1;
-  //     case EAST:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  //     case WEST:
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //   } 
-  // }
-  // else if(frontData > DIST_THRESH && rightData > DIST_THRESH && leftData > DIST_THRESH) { // obstacle at right 
-  //   movement = FORWARD; 
-  //   switch(direction) {
-  //     case NORTH:
-  //       myRobot.NewVisited[row][col+1] = 1;
-  //     case SOUTH:
-  //       myRobot.NewVisited[row+1][col-1] = 1;
-  //     case EAST:
-  //       myRobot.NewVisited[row+1][col] = 1;
-  //     case WEST:
-  //       myRobot.NewVisited[row-1][col] = 1;
-  // } 
-  // } 
-  // else { movement = FORWARD; } // no obstacle ahead
 }
 
 void executeMovementCode() {
-  // Maze
   if(myRobot.Maze[row][col] != WALL && myRobot.Maze[row][col] != END) {
-  // NewMaze
-  // if(myRobot.NewMaze[row][col] != WALL && myRobot.NewMaze[row][col] != START && myRobot.NewMaze[row][col] != END) {
     switch(movement) {
       case FORWARD:
         leftWheelObj.moveForward();
@@ -210,8 +83,7 @@ void executeMovementCode() {
         checkMovement.disable();
         leftPulse = 0;
         rightPulse = 0;
-        while ( leftPulse < 11 && rightPulse < 11 )
-        {
+        while{leftPulse < 11 && rightPulse < 11) {
           leftWheelObj.moveLeft();
           rightWheelObj.moveLeft();
         }
@@ -227,8 +99,7 @@ void executeMovementCode() {
         checkMovement.disable();
         leftPulse = 0;
         rightPulse = 0;
-        while ( leftPulse < 11 && rightPulse < 11 )
-        {
+        while (leftPulse < 11 && rightPulse < 11) {
           leftWheelObj.moveRight();
           rightWheelObj.moveRight();
         }
@@ -254,10 +125,7 @@ void executeMovementCode() {
         break;
     }
   }
-  // Maze
   if(myRobot.Maze[row][col] == END) {
-  // New Maze
-  // if(myRobot.NewMaze[row][col] == END) {
     leftWheelObj.moveStop();
     rightWheelObj.moveStop();
   }
