@@ -11,30 +11,42 @@ using namespace std;
 class maze {
     public:
         maze(leftWheel, rightWheel, ultrasonic, ultrasonic, ultrasonic, encoder, encoder);
-        int Maze[12][12] = { 0 };
-        bool visited[12][12] = { false }
-        void initializeMaze();
+        int Maze[SIZE][SIZE] = { 0 };
+        int horizontalWall[SIZE][SIZE] = { 0 }; // 1 for North Wall, 3 for South Wall
+        int verticalWall[SIZE][SIZE] = { 0 }; // 4 for West Wall, 2 for East Wall
+        queue<pair<int, int>> q;
+        void initializeWallState();
+        void testFunctions();
+        void solveMaze();
+        int min(int, int);
+        void updateMazeCode();
+        void executeMovementCode();
+        void choosePathCode();
         void printMaze();
+        bool isValid();
         void checkNextMoveCode();
+        void checkAvailableCode();
         void checkWallCode();
         void floodFillCode();
         void checkTask();
         void enableTask();
-        TimedAction checkNextMove = TimedAction(TASK_INTERVAL, checkNextMoveCode);
+        TimedAction updateMaze = TimedAction(TASK_INTERVAL, updateMazeCode);
+        TimedAction executeMovement = TimedAction(TASK_INTERVAL, executeMovementCode);
+        TimedAction choosePath = TimedAction(TASK_INTERVAL, choosePathCode);
         TimedAction checkWall = TimedAction(TASK_INTERVAL, checkWallCode);
+        TimedAction checkAvailable = TimedAction(TASK_INTERVAL, checkAvailableCode);
+        TimedAction checkNextMove = TimedAction(TASK_INTERVAL, checkNextMoveCode);
         TimedAction floodFill = TimedAction(TASK_INTERVAL, floodFillCode);
     private:
-        leftWheel _leftWheel;
-        rightWheel _rightWheel;
-        ultrasonic _front;
-        ultrasonic _left;
-        ultrasonic _right;
-        encoder _left_enc;
-        encoder _right_enc;
-        int row, col = 0;
-        int dr[] = { -1, 1, 0, 0 };
-        int dc[] = { 0, 0, -1, 1 };
-        queue<pair<int, int>> q;
+        leftWheel LeftWheel;
+        rightWheel RightWheel;
+        ultrasonic Front;
+        ultrasonic Left;
+        ultrasonic Right;
+        encoder LeftEnc;
+        encoder RightEnc;
+        int row = 11;
+        int col = 0;
 };
 
 #endif; // MAZE_H_INCLUDED

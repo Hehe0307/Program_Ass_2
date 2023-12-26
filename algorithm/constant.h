@@ -15,6 +15,8 @@
 
 #define LEFT_ENC 21
 #define RIGHT_ENC 20
+#define LEFT_PIN 19
+#define RIGHT_PIN 18
 
 // Constants
 #define DIST_THRESH 7
@@ -30,6 +32,7 @@ enum {
   NORTH, SOUTH, EAST, WEST
 } direction;
 
-enum {
-  NORTH_WALL, SOUTH_WALL, EAST_WALL, WEST_WALL
-} wall;
+bool NORTH_WALL = false;
+bool SOUTH_WALL = false;
+bool EAST_WALL = false;
+bool WEST_WALL = false;
