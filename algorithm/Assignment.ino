@@ -6,6 +6,7 @@
 #include "leftWheel.h"
 #include "rightWheel.h"
 #include "encoder.h"
+#include "queue.h"
 #include "maze.h"
 
 leftWheel leftWheelObj(LEFT_PWM, LEFT_DIR_1, LEFT_DIR_2);

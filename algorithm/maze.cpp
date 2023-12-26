@@ -8,144 +8,143 @@
 #include "queue.h"
 
 #include "Arduino.h"
-#include <queue>
 
 maze::maze(leftWheel LeftWheel, rightWheel RightWheel, ultrasonic Front, ultrasonic Left, ultrasonic Right, encoder LeftEnc, encoder rightEnc, Queue q1, Queue q2)
 : LeftWheel(LeftWheel), RightWheel(RightWheel), Front(Front), Left(Left), Right(Right), LeftEnc(LeftEnc), RightEnc(RightEnc), q1(q1), q2(q2) {}
 
 int maze::min(int a, int b) {
-    if(a < b) { return a; }
-    return b;
+  if(a < b) { return a; }
+  return b;
 }
 
 void maze::printMaze() {
-    for(int i = 0; i < SIZE; i++) {
-        for(int j = 0; j < SIZE; j++) {
-            Serial.print(Maze[i][j]); Serial.print(" ");
-        }
-        Serial.println("");
+  for(int i = 0; i < SIZE; i++) {
+    for(int j = 0; j < SIZE; j++) {
+      Serial.print(Maze[i][j]); Serial.print(" ");
     }
+    Serial.println("");
+  }
 }
 
 void maze::checkWallCode() {
-    long frontData = Front.retrieveData();
-    long leftData = Left.retrieveData();
-    long rightData = Right.retrieveData();
-    if(frontData < DIST_THRESH) { 
-        switch(direction) {
-            case NORTH: horizontalWall[row][col]++; break;
-            case SOUTH: horizontalWall[row][col] += 3; break;
-            case EAST: verticalWall[row][col] += 2; break;
-            case WEST: verticalWall[row][col] += 4; break;
-        }
+  long frontData = Front.retrieveData();
+  long leftData = Left.retrieveData();
+  long rightData = Right.retrieveData();
+  if(frontData < DIST_THRESH) { 
+    switch(direction) {
+      case NORTH: horizontalWall[row][col]++; break;
+      case SOUTH: horizontalWall[row][col] += 3; break;
+      case EAST: verticalWall[row][col] += 2; break;
+      case WEST: verticalWall[row][col] += 4; break;
     }
-    if(leftData < DIST_THRESH) { 
-        switch(direction) {
-            case NORTH: verticalWall[row][col] += 4; break;
-            case SOUTH: verticalWall[row][col] += 2; break;
-            case EAST: horizontalWall[row][col]++; break;
-            case WEST: horizontalWall[row][col] += 3; break;
-        }
+  }
+  if(leftData < DIST_THRESH) { 
+    switch(direction) {
+      case NORTH: verticalWall[row][col] += 4; break;
+      case SOUTH: verticalWall[row][col] += 2; break;
+      case EAST: horizontalWall[row][col]++; break;
+      case WEST: horizontalWall[row][col] += 3; break;
     }
-    if(rightData < DIST_THRESH) { 
-        switch(direction) {
-            case NORTH: verticalWall[row][col] += 2; break;
-            case SOUTH: verticalWall[row][col] += 4; break;
-            case EAST: horizontalWall[row][col] += 3; break;
-            case WEST: horizontalWall[row][col]++; break;
-        }
-    }  
+  }
+  if(rightData < DIST_THRESH) { 
+    switch(direction) {
+      case NORTH: verticalWall[row][col] += 2; break;
+      case SOUTH: verticalWall[row][col] += 4; break;
+      case EAST: horizontalWall[row][col] += 3; break;
+      case WEST: horizontalWall[row][col]++; break;
+    }
+  }  
 }
 
 void maze::checkAvailableCode() {
-    switch(horizontalWall[row][col]) {
-        case 0: q1.enqueue(row-1); q2.enqueue(col); q1.enqueue(row+1); q2.enqueue(col); break;
-        case 1: q1.enqueue(row+1); q2.enqueue(col); NORTH_WALL = true; break;
-        case 3: q1.enqueue(row-1); q2.enqueue(col); SOUTH_WALL = true; break;
-        case 4: NORTH_WALL = true; SOUTH_WALL = true; break;
-        default: break;
-    }
+  switch(horizontalWall[row][col]) {
+    case 0: q1.enqueue(row-1); q2.enqueue(col); q1.enqueue(row+1); q2.enqueue(col); break;
+    case 1: q1.enqueue(row+1); q2.enqueue(col); NORTH_WALL = true; break;
+    case 3: q1.enqueue(row-1); q2.enqueue(col); SOUTH_WALL = true; break;
+    case 4: NORTH_WALL = true; SOUTH_WALL = true; break;
+    default: break;
+  }
 
-    switch(verticalWall[row][col]) {
-        case 0: q1.enqueue(row); q2.enqueue(col-1); q1.enqueue(row); q2.enqueue(col+1); break;
-        case 2: q1.enqueue(row); q2.enqueue(col-1); EAST_WALL = true; break;
-        case 4: q1.enqueue(row); q2.enqueue(col+1); WEST_WALL = true; break;
-        case 6: EAST_WALL = true; WEST_WALL = true; break;
-        default: break; 
-    }
+  switch(verticalWall[row][col]) {
+    case 0: q1.enqueue(row); q2.enqueue(col-1); q1.enqueue(row); q2.enqueue(col+1); break;
+    case 2: q1.enqueue(row); q2.enqueue(col-1); EAST_WALL = true; break;
+    case 4: q1.enqueue(row); q2.enqueue(col+1); WEST_WALL = true; break;
+    case 6: EAST_WALL = true; WEST_WALL = true; break;
+    default: break; 
+  }
 }
 
 bool maze::isValid(int row, int col) {
-    return(row >= 0 && col >= 0 && row < SIZE && col < SIZE);
+  return(row >= 0 && col >= 0 && row < SIZE && col < SIZE);
 }
 
 void maze::initializeWallState() {
-    NORTH_WALL = false;
-    SOUTH_WALL = false;
-    EAST_WALL = false;
-    WEST_WALL = false;
+  NORTH_WALL = false;
+  SOUTH_WALL = false;
+  EAST_WALL = false;
+  WEST_WALL = false;
 }
 
 int maze::checkNextMoveCode() {
-    int minDist = 150;
-    if(isValid(row, col)) {
-        if(!NORTH_WALL && Maze[row][col] != 0) { minDist = min(minDist, Maze[row-1][col]); }
-        if(!EAST_WALL && Maze[row][col] != 0) { minDist = min(minDist, Maze[row][col+1]); }
-        if(!WEST_WALL && Maze[row][col] != 0) { minDist = min(minDist, Maze[row][col-1]); }
-        if(!SOUTH_WALL && Maze[row][col] != 0) { minDist = min(minDist, Maze[row+1][col]); }
-    }
-    initializeWallState();
-    return minDist;
+  int minDist = 150;
+  if(isValid(row, col)) {
+    if(!NORTH_WALL && Maze[row][col] != 0) { minDist = min(minDist, Maze[row-1][col]); }
+    if(!EAST_WALL && Maze[row][col] != 0) { minDist = min(minDist, Maze[row][col+1]); }
+    if(!WEST_WALL && Maze[row][col] != 0) { minDist = min(minDist, Maze[row][col-1]); }
+    if(!SOUTH_WALL && Maze[row][col] != 0) { minDist = min(minDist, Maze[row+1][col]); }
+  }
+  initializeWallState();
+  return minDist;
 }
 
 void maze::floodFillCode(int maze[SIZE][SIZE], int startRow, int startCol, Queue q1, Queue q2) {
-    int dr[] = { -1, 1, 0, 0 };
-    int dc[] = { 0, 0, -1, 1 };
+  int dr[] = { -1, 1, 0, 0 };
+  int dc[] = { 0, 0, -1, 1 };
 
-    for(int i = 0; i < SIZE; i++) {
-        for(int j = 0; j < SIZE; j++) {
-            if(maze[i][j] != 0) {
-                maze[i][j] = -1; // Blank state
-            }
-        }
+  for(int i = 0; i < SIZE; i++) {
+    for(int j = 0; j < SIZE; j++) {
+      if(maze[i][j] != 0) {
+        maze[i][j] = -1; // Blank state
+      }
     }
+  }
 
-    // Set startRow and startCol to 6
-    maze[startRow][startCol] = 0;
-    maze[startRow-1][startCol] = 0;
-    maze[startRow][startCol-1] = 0;
-    maze[startRow-1][startCol-1] = 0;
+  // Set startRow and startCol to 6
+  maze[startRow][startCol] = 0;
+  maze[startRow-1][startCol] = 0;
+  maze[startRow][startCol-1] = 0;
+  maze[startRow-1][startCol-1] = 0;
 
-    q1.enqueue(startRow);
-    q2.enqueue(startCol);
-    q1.enqueue(startRow - 1);
-    q2.enqueue(startCol);
-    q1.enqueue(startRow);
-    q2.enqueue(startCol - 1);
-    q1.enqueue(startRow - 1);
-    q2.enqueue(startCol - 1);
+  q1.enqueue(startRow);
+  q2.enqueue(startCol);
+  q1.enqueue(startRow - 1);
+  q2.enqueue(startCol);
+  q1.enqueue(startRow);
+  q2.enqueue(startCol - 1);
+  q1.enqueue(startRow - 1);
+  q2.enqueue(startCol - 1);
 
-    while(!q.isEmptyQueue()) {
-        //Dequeue the front position
-        q1.dequeue();
-        q2.dequeue();
+  while(!q.isEmptyQueue()) {
+    //Dequeue the front position
+    q1.dequeue();
+    q2.dequeue();
 
-        int Row = q1.dequeue();
-        int Col = q2.dequeue();
+    int Row = q1.dequeue();
+    int Col = q2.dequeue();
 
-        for(int i = 0; i < 4; i++){
-            int newRow = Row + dr[i];
-            int newCol = Col + dc[i];
+    for(int i = 0; i < 4; i++){
+      int newRow = Row + dr[i];
+      int newCol = Col + dc[i];
 
-            if(isValid(newRow, newCol) && maze[newRow][newCol] != -1){
-                maze[newRow][newCol]++;
+      if(isValid(newRow, newCol) && maze[newRow][newCol] != -1){
+        maze[newRow][newCol]++;
 
-                q1.enqueue(newRow);
-                q2.enqueue(newCol);
-            }
-        }
-        printMaze();
+        q1.enqueue(newRow);
+        q2.enqueue(newCol);
+      }
     }
+    printMaze();
+  }
 }
 
 void maze::updateMazeCode() {
@@ -236,34 +235,34 @@ void maze::executeMovementCode() {
 }
 
 void maze::choosePathCode() {
-    int Dist = checkNextMoveCode();
-    switch(direction) {
-        case NORTH:
-            if(Dist == Maze[row-1][col]) { movement = FORWARD; }
-            if(Dist == Maze[row+1][col]) { movement = REVERSE; }
-            if(Dist == Maze[row][col-1]) { movement = LEFT; }
-            if(Dist == Maze[row][col+1]) { movement = RIGHT; }
-            break;
-        case SOUTH:
-            if(Dist == Maze[row-1][col]) { movement = REVERSE; }
-            if(Dist == Maze[row+1][col]) { movement = FORWARD; }
-            if(Dist == Maze[row][col-1]) { movement = RIGHT; }
-            if(Dist == Maze[row][col+1]) { movement = LEFT; }
-            break;
-        case EAST:
-            if(Dist == Maze[row-1][col]) { movement = LEFT; }
-            if(Dist == Maze[row+1][col]) { movement = RIGHT; }
-            if(Dist == Maze[row][col-1]) { movement = REVERSE; }
-            if(Dist == Maze[row][col+1]) { movement = FORWARD; }
-            break;
-        case WEST:
-            if(Dist == Maze[row-1][col]) { movement = RIGHT; }
-            if(Dist == Maze[row+1][col]) { movement = LEFT; }
-            if(Dist == Maze[row][col-1]) { movement = FORWARD; }
-            if(Dist == Maze[row][col+1]) { movement = REVERSE; }
-            break;
-        default: break;
-    }
+  int Dist = checkNextMoveCode();
+  switch(direction) {
+    case NORTH:
+      if(Dist == Maze[row-1][col]) { movement = FORWARD; }
+      if(Dist == Maze[row+1][col]) { movement = REVERSE; }
+      if(Dist == Maze[row][col-1]) { movement = LEFT; }
+      if(Dist == Maze[row][col+1]) { movement = RIGHT; }
+      break;
+    case SOUTH:
+      if(Dist == Maze[row-1][col]) { movement = REVERSE; }
+      if(Dist == Maze[row+1][col]) { movement = FORWARD; }
+      if(Dist == Maze[row][col-1]) { movement = RIGHT; }
+      if(Dist == Maze[row][col+1]) { movement = LEFT; }
+      break;
+    case EAST:
+      if(Dist == Maze[row-1][col]) { movement = LEFT; }
+      if(Dist == Maze[row+1][col]) { movement = RIGHT; }
+      if(Dist == Maze[row][col-1]) { movement = REVERSE; }
+      if(Dist == Maze[row][col+1]) { movement = FORWARD; }
+      break;
+    case WEST:
+      if(Dist == Maze[row-1][col]) { movement = RIGHT; }
+      if(Dist == Maze[row+1][col]) { movement = LEFT; }
+      if(Dist == Maze[row][col-1]) { movement = FORWARD; }
+      if(Dist == Maze[row][col+1]) { movement = REVERSE; }
+      break;
+    default: break;
+  }
 }
 
 void maze::testFunctions() {
@@ -382,25 +381,25 @@ void maze::pidRightWheelCode() {
 }
 
 void maze::checkTask() {
-    checkWall.check();
-    checkAvailable.check();
-    floodFill.check();
-    checkNextMove.check();
-    choosePath.check();
-    executeMovement.check();
-    pidLeftWheel.check();
-    pidRightWheel.check();
-    updateMaze.check();
+  checkWall.check();
+  checkAvailable.check();
+  floodFill.check();
+  checkNextMove.check();
+  choosePath.check();
+  executeMovement.check();
+  pidLeftWheel.check();
+  pidRightWheel.check();
+  updateMaze.check();
 }
 
 void maze::enableTask() {
-    checkWall.enable();
-    checkAvailable.enable();
-    floodFill.enable();
-    checkNextMove.enable();
-    choosePath.enable();
-    executeMovement.enable();
-    pidLeftWheel.enable();
-    pidRightWheel.enable();
-    updateMaze.enable();
+  checkWall.enable();
+  checkAvailable.enable();
+  floodFill.enable();
+  checkNextMove.enable();
+  choosePath.enable();
+  executeMovement.enable();
+  pidLeftWheel.enable();
+  pidRightWheel.enable();
+  updateMaze.enable();
 }
