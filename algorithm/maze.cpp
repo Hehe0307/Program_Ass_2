@@ -5,12 +5,13 @@
 #include "encoder.h"
 #include "maze.h"
 #include "constant.h"
+#include "queue.h"
 
 #include "Arduino.h"
 #include <queue>
 
-maze::maze(leftWheel LeftWheel, rightWheel RightWheel, ultrasonic Front, ultrasonic Left, ultrasonic Right, encoder LeftEnc, encoder rightEnc)
-: LeftWheel(LeftWheel), RightWheel(RightWheel), Front(Front), Left(Left), Right(Right), LeftEnc(LeftEnc), RightEnc(RightEnc) {}
+maze::maze(leftWheel LeftWheel, rightWheel RightWheel, ultrasonic Front, ultrasonic Left, ultrasonic Right, encoder LeftEnc, encoder rightEnc, Queue q1, Queue q2)
+: LeftWheel(LeftWheel), RightWheel(RightWheel), Front(Front), Left(Left), Right(Right), LeftEnc(LeftEnc), RightEnc(RightEnc), q1(q1), q2(q2) {}
 
 int maze::min(int a, int b) {
     if(a < b) { return a; }
@@ -58,17 +59,17 @@ void maze::checkWallCode() {
 
 void maze::checkAvailableCode() {
     switch(horizontalWall[row][col]) {
-        case 0: q.push({row-1, col}); q.push({row+1, col}); break;
-        case 1: q.push({row+1, col}); NORTH_WALL = true; break;
-        case 3: q.push({row-1, col}); SOUTH_WALL = true; break;
+        case 0: q1.enqueue(row-1); q2.enqueue(col); q1.enqueue(row+1); q2.enqueue(col); break;
+        case 1: q1.enqueue(row+1); q2.enqueue(col); NORTH_WALL = true; break;
+        case 3: q1.enqueue(row-1); q2.enqueue(col); SOUTH_WALL = true; break;
         case 4: NORTH_WALL = true; SOUTH_WALL = true; break;
         default: break;
     }
 
     switch(verticalWall[row][col]) {
-        case 0: q.push({row, col-1}); q.push({row, col+1}); break;
-        case 2: q.push({row, col-1}); EAST_WALL = true; break;
-        case 4: q.push({row, col+1}); WEST_WALL = true; break;
+        case 0: q1.enqueue(row); q2.enqueue(col-1); q1.enqueue(row); q2.enqueue(col+1); break;
+        case 2: q1.enqueue(row); q2.enqueue(col-1); EAST_WALL = true; break;
+        case 4: q1.enqueue(row); q2.enqueue(col+1); WEST_WALL = true; break;
         case 6: EAST_WALL = true; WEST_WALL = true; break;
         default: break; 
     }
@@ -97,7 +98,7 @@ int maze::checkNextMoveCode() {
     return minDist;
 }
 
-void maze::floodFillCode(int maze[SIZE][SIZE], int startRow, int startCol) {
+void maze::floodFillCode(int maze[SIZE][SIZE], int startRow, int startCol, Queue q1, Queue q2) {
     int dr[] = { -1, 1, 0, 0 };
     int dc[] = { 0, 0, -1, 1 };
 
@@ -115,18 +116,22 @@ void maze::floodFillCode(int maze[SIZE][SIZE], int startRow, int startCol) {
     maze[startRow][startCol-1] = 0;
     maze[startRow-1][startCol-1] = 0;
 
-    q.push({startRow, startCol});
-    q.push({startRow-1, startCol});
-    q.push({startRow, startCol-1});
-    q.push({startRow-1, startCol-1});
+    q1.enqueue(startRow);
+    q2.enqueue(startCol);
+    q1.enqueue(startRow - 1);
+    q2.enqueue(startCol);
+    q1.enqueue(startRow);
+    q2.enqueue(startCol - 1);
+    q1.enqueue(startRow - 1);
+    q2.enqueue(startCol - 1);
 
-    while(!q.empty()) {
+    while(!q.isEmptyQueue()) {
         //Dequeue the front position
-        pair<int, int> current = q.front();
-        q.pop();
+        q1.dequeue();
+        q2.dequeue();
 
-        int Row = current.first;
-        int Col = current.second;
+        int Row = q1.dequeue();
+        int Col = q2.dequeue();
 
         for(int i = 0; i < 4; i++){
             int newRow = Row + dr[i];
@@ -135,31 +140,12 @@ void maze::floodFillCode(int maze[SIZE][SIZE], int startRow, int startCol) {
             if(isValid(newRow, newCol) && maze[newRow][newCol] != -1){
                 maze[newRow][newCol]++;
 
-                q.push({newRow, newCol});
+                q1.enqueue(newRow);
+                q2.enqueue(newCol);
             }
         }
         printMaze();
     }
-}
-
-void maze::checkTask() {
-    checkWall.check();
-    checkAvailable.check();
-    floodFill.check();
-    checkNextMove.check();
-    choosePath.check();
-    executeMovement.check();
-    updateMaze.check();
-}
-
-void maze::enableTask() {
-    checkWall.enable();
-    checkAvailable.enable();
-    floodFill.enable();
-    checkNextMove.enable();
-    choosePath.enable();
-    executeMovement.enable();
-    updateMaze.enable();
 }
 
 void maze::updateMazeCode() {
@@ -280,3 +266,141 @@ void maze::choosePathCode() {
     }
 }
 
+void maze::testFunctions() {
+  // Wheel Function Test
+  Serial.println("Forward");
+  LeftWheel.moveForward();
+  RightWheel.moveForward();
+  delay(2000);
+
+  Serial.println("Left");
+  LeftWheel.moveLeft();
+  RightWheel.moveLeft();
+  delay(2000);
+  
+  Serial.println("Right");
+  LeftWheel.moveRight();
+  RightWheel.moveRight();
+  delay(2000);
+
+  Serial.println("Reverse");
+  LeftWheel.moveReverse();
+  RightWheel.moveReverse();
+  delay(2000);
+
+  Serial.println("Stop");
+  LeftWheel.moveStop();
+  RightWheel.moveStop();
+  delay(2000);
+
+  // Ultrasonic Sensor Test
+  Serial.print("Front Sensor: ");
+  Serial.println(Front.retrieveData());
+  delay(1000);
+
+  Serial.print("Right Sensor: ");
+  Serial.println(Right.retrieveData());
+  delay(1000);
+
+  Serial.print("Left Sensor: ");
+  Serial.println(Left.retrieveData());
+  delay(1000);
+}
+
+void maze::solveMaze() {
+  float frontData = Front.retrieveData();
+  float rightData = Right.retrieveData();
+  float leftData = Left.retrieveData();
+  while(true) {
+    if (frontData > DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { // left & right have obstacles but front is clear
+      LeftWheel.moveForward();
+      RightWheel.moveForward(); 
+      // Serial.println("Forward");
+      // delay(100);
+    }
+    else if ( frontData < DIST_THRESH && rightData < DIST_THRESH && leftData < DIST_THRESH) { // obstacle infront of all 3 sides, reverse
+      LeftWheel.moveReverse();
+      RightWheel.moveReverse();
+      // Serial.println("Reverse");
+      delay(500);
+      if((leftData) > (rightData)) { 
+        LeftWheel.moveLeft();
+        RightWheel.moveLeft();
+        // Serial.println("Left");
+        // delay(100); 
+      }
+      else { 
+        LeftWheel.moveRight();
+        RightWheel.moveRight();
+        // Serial.println("Right"); 
+        // delay(100);
+      }
+    }
+    else if (frontData < DIST_THRESH && rightData < DIST_THRESH && leftData > DIST_THRESH) { // obstacle on right and front sides, turn left side 
+      LeftWheel.moveLeft(); 
+      RightWheel.moveLeft(); 
+      // Serial.println("Left");
+      // delay(100);
+    }
+    else if (frontData < DIST_THRESH && rightData > DIST_THRESH && leftData < DIST_THRESH) { // obstacle on left and front sides, turn right side
+      LeftWheel.moveRight();
+      RightWheel.moveRight();
+      // Serial.println("Right");
+      // delay(100);
+    }
+    else  if (frontData < DIST_THRESH && rightData > DIST_THRESH && leftData > DIST_THRESH) { // obstacle on front side, turn left
+      LeftWheel.moveLeft();
+      LeftWheel.moveLeft(); 
+    }
+    else if (frontData > DIST_THRESH && rightData > DIST_THRESH && leftData < DIST_THRESH) { // obstacle on left side, forward
+      LeftWheel.moveForward();
+      RightWheel.moveForward();
+      // Serial.println("Forward");
+      // delay(100);
+    }
+    else if (frontData > DIST_THRESH && rightData < DIST_THRESH && leftData > DIST_THRESH) { // obstacle on right side, turn left & then forward
+      LeftWheel.moveForward();
+      RightWheel.moveForward();
+      // Serial.println("Forward");
+      // delay(100);
+    }
+    else { // no osbtacle ahead
+      LeftWheel.moveForward();
+      RightWheel.moveForward();
+      // Serial.println("Forward");
+      // delay(100);
+    }
+  }
+}
+
+void maze::pidLeftWheelCode() {
+
+}
+
+void maze::pidRightWheelCode() {
+
+}
+
+void maze::checkTask() {
+    checkWall.check();
+    checkAvailable.check();
+    floodFill.check();
+    checkNextMove.check();
+    choosePath.check();
+    executeMovement.check();
+    pidLeftWheel.check();
+    pidRightWheel.check();
+    updateMaze.check();
+}
+
+void maze::enableTask() {
+    checkWall.enable();
+    checkAvailable.enable();
+    floodFill.enable();
+    checkNextMove.enable();
+    choosePath.enable();
+    executeMovement.enable();
+    pidLeftWheel.enable();
+    pidRightWheel.enable();
+    updateMaze.enable();
+}
