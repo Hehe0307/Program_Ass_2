@@ -4,8 +4,8 @@
 // Implementation of 'wheel' class
 wheel::wheel() {}
 
-wheel::wheel(const int wheel_pwm, const int wheel_dir_1, const int wheel_dir_2) 
-: wheel_pwm(wheel_pwm), wheel_dir_1(wheel_dir_1), wheel_dir_2(wheel_dir_2) {}
+wheel::wheel(const int wheel_pwm, const int wheel_dir_1, const int wheel_dir_2, int speed) 
+: wheel_pwm(wheel_pwm), wheel_dir_1(wheel_dir_1), wheel_dir_2(wheel_dir_2), speed(speed) {}
 
 void wheel::declarePin() {
   pinMode(wheel_pwm, OUTPUT);
@@ -14,7 +14,7 @@ void wheel::declarePin() {
 }
 
 void wheel::moveForward() {
-  analogWrite(wheel_pwm, 220);
+  analogWrite(wheel_pwm, speed);
   digitalWrite(wheel_dir_1, HIGH);
   digitalWrite(wheel_dir_2, LOW);
 }

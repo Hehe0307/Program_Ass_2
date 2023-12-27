@@ -41,6 +41,7 @@ int checkNextMoveCode();
 void checkAvailableCode();
 void checkWallCode();
 void floodFillCode(int maze[SIZE][SIZE], int startRow, int startCol);
+void tunePositionCode();
 
 volatile uint32_t leftPulse = 0;
 volatile uint32_t rightPulse = 0;
@@ -59,6 +60,7 @@ TimedAction checkNextMove = TimedAction(TASK_INTERVAL, checkNextMoveCode);
 TimedAction floodFill = TimedAction(TASK_INTERVAL, floodFillCode);
 TimedAction getLeftPulse = TimedAction(TASK_INTERVAL, getLeftPulseCode);
 TimedAction getRightPulse = TimedAction(TASK_INTERVAL, getRightPulseCode);
+TimedAction tunePosition = TimedAction(TASK_INTERVAL, tunePositionCode);
 
 int minimum(int a, int b) {
   if(a < b) { return a; }
@@ -313,26 +315,37 @@ void choosePathCode() {
   }
 }
 
+void tunePositionCode() {
+  long leftData = leftSensor.retrieveData();
+  long rightData = rightSensor.retrieveData();
+  if(leftData > 20 && leftData < 25) { leftWheelObj.speed = 220; }
+  else { leftWheelObj.speed = 200; }
+  if(rightData > 20 && rightData < 25) { rightWheelObj.speed = 220; }
+  else { rightWheelObj.speed = 200; }
+}
+
 void checkTask() {
-  // checkWall.check();
-  // checkAvailable.check();
-  // floodFill.check();
-  // checkNextMove.check();
-  // choosePath.check();
-  // executeMovement.check();
-  // updateMaze.check();
+  checkWall.check();
+  checkAvailable.check();
+  floodFill.check();
+  checkNextMove.check();
+  choosePath.check();
+  executeMovement.check();
+  updateMaze.check();
+  tunePosition.check();
   getLeftPulse.check();
   getRightPulse.check();
 }
 
 void enableTask() {
-  // checkWall.enable();
-  // checkAvailable.enable();
-  // floodFill.enable();
-  // checkNextMove.enable();
-  // choosePath.enable();
-  // executeMovement.enable();
-  // updateMaze.enable();
+  checkWall.enable();
+  checkAvailable.enable();
+  floodFill.enable();
+  checkNextMove.enable();
+  choosePath.enable();
+  executeMovement.enable();
+  updateMaze.enable();
+  tunePosition.enable();
   getLeftPulse.enable();
   getRightPulse.enable();
 }
@@ -350,7 +363,7 @@ void setup() {
   pinMode(RIGHT_ENC, INPUT);
   attachInterrupt(digitalPinToInterrupt(RIGHT_ENC), rightCounter, RISING);
 
-  // enableTask();
+  enableTask();
 }
 
 void loop() {
@@ -360,5 +373,5 @@ void loop() {
   Serial.print("Left Encoder Pulse: "); Serial.print(leftPulse); Serial.print("    ");
   Serial.print("Right Encoder Pulse:"); Serial.println(rightPulse);
 
-  // checkTask();  
+  checkTask();  
 }
