@@ -18,5 +18,6 @@ long ultrasonic::retrieveData()
   delayMicroseconds(10); // this delay is required as well!
   digitalWrite(trigPin, LOW);
   duration = pulseIn(echoPin, HIGH);
-  return (duration / 58); // convert the distance  to centimeters.
+  long distance = 0.0343 * duration / 2;
+  return distance; 
 }

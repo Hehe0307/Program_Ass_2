@@ -14,13 +14,13 @@ void wheel::declarePin() {
 }
 
 void wheel::moveForward() {
-  digitalWrite(wheel_pwm, HIGH);
+  analogWrite(wheel_pwm, 220);
   digitalWrite(wheel_dir_1, HIGH);
   digitalWrite(wheel_dir_2, LOW);
 }
 
 void wheel::moveStop() {
-  digitalWrite(wheel_pwm, LOW);
+  analogWrite(wheel_pwm, 0);
   digitalWrite(wheel_dir_1, HIGH);
   digitalWrite(wheel_dir_2, LOW);
 }

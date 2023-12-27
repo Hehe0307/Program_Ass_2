@@ -11,25 +11,25 @@ void rightWheel::declarePin() {
 }
 
 void rightWheel::moveForward() {
-  digitalWrite(right_pwm, HIGH);
+  analogWrite(right_pwm, 220);
   digitalWrite(right_dir_1, HIGH);
   digitalWrite(right_dir_2, LOW);
 }
 
 void rightWheel::moveStop() {
-  digitalWrite(right_pwm, LOW);
+  analogWrite(right_pwm, 0);
   digitalWrite(right_dir_1, HIGH);
   digitalWrite(right_dir_2, LOW);
 }
 
 void rightWheel::moveLeft() {
-    digitalWrite(right_pwm, HIGH);
+    analogWrite(right_pwm, 220);
     digitalWrite(right_dir_1, HIGH);
     digitalWrite(right_dir_2, LOW);
 }
 
 void rightWheel::moveRight() {
-  digitalWrite(right_pwm, HIGH);
+  analogWrite(right_pwm, 220);
   digitalWrite(right_dir_1, LOW);
   digitalWrite(right_dir_2, HIGH);
 }

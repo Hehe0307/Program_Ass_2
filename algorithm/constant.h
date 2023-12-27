@@ -19,17 +19,27 @@
 #define RIGHT_PIN 18
 
 // Constants
-#define DIST_THRESH 7
+#define FRONT_DIST_THRESH 12
+#define SIDE_DIST_THRESH 7
 #define PULSE_PER_GRID 24
-#define TASK_INTERVAL 100
 #define SIZE 12
+#define TASK_INTERVAL 100
 
-enum {
-  FORWARD, LEFT, RIGHT, REVERSE, STOP
+enum 
+{
+  FORWARD, 
+  LEFT, 
+  RIGHT, 
+  REVERSE, 
+  STOP,
 } movement;
 
-enum {
-  NORTH, SOUTH, EAST, WEST
+enum 
+{
+  NORTH, 
+  SOUTH, 
+  EAST, 
+  WEST,
 } direction;
 
 bool NORTH_WALL = false;
