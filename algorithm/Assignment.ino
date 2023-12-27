@@ -8,8 +8,8 @@
 #include "queue.h"
 #include "maze.h"
 
-leftWheel leftWheelObj(LEFT_PWM, LEFT_DIR_1, LEFT_DIR_2);
-rightWheel rightWheelObj(RIGHT_PWM, RIGHT_DIR_1, RIGHT_DIR_2);
+leftWheel leftWheelObj(LEFT_PWM, LEFT_DIR_1, LEFT_DIR_2, 200);
+rightWheel rightWheelObj(RIGHT_PWM, RIGHT_DIR_1, RIGHT_DIR_2, 200);
 ultrasonic frontSensor(FRONT_TRIG, FRONT_ECHO);
 ultrasonic rightSensor(RIGHT_TRIG, RIGHT_ECHO);
 ultrasonic leftSensor(LEFT_TRIG, LEFT_ECHO);

@@ -7,7 +7,7 @@ leftWheel::leftWheel(const int left_pwm, const int left_dir_1, const int left_di
 : left_pwm(left_pwm), left_dir_1(left_dir_1), left_dir_2(left_dir_2), speed(speed) {}
 
 void leftWheel::declarePin() {
-  wheel::wheel(left_pwm, left_dir_1, left_dir_2);
+  wheel::wheel(left_pwm, left_dir_1, left_dir_2, speed);
 }
 
 void leftWheel::moveForward() {
