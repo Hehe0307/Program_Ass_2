@@ -3,39 +3,39 @@
 #include "Arduino.h"
 
 // Implementation of 'leftWheel' class
-leftWheel::leftWheel(const int left_pwm, const int left_dir_1, const int left_dir_2) 
-: left_pwm(left_pwm), left_dir_1(left_dir_1), left_dir_2(left_dir_2) {}
+leftWheel::leftWheel(const int left_pwm, const int left_dir_1, const int left_dir_2, int speed) 
+: left_pwm(left_pwm), left_dir_1(left_dir_1), left_dir_2(left_dir_2), speed(speed) {}
 
 void leftWheel::declarePin() {
-  wheel::wheel(left_pwm, left_dir_1, left_dir_2);
+  wheel::wheel(left_pwm, left_dir_1, left_dir_2, speed);
 }
 
 void leftWheel::moveForward() {
-  digitalWrite(left_pwm, HIGH);
+  analogWrite(left_pwm, speed);
   digitalWrite(left_dir_1, HIGH);
   digitalWrite(left_dir_2, LOW);
 }
 
 void leftWheel::moveReverse() {
-  digitalWrite(left_pwm, HIGH);
+  analogWrite(left_pwm, speed);
   digitalWrite(left_dir_1, LOW);
   digitalWrite(left_dir_2, HIGH);
 }
 
 void leftWheel::moveStop() {
-  digitalWrite(left_pwm, LOW);
+  analogWrite(left_pwm, 0);
   digitalWrite(left_dir_1, HIGH);
   digitalWrite(left_dir_2, LOW);
 }
  
 void leftWheel::moveLeft() {
-  digitalWrite(left_pwm, HIGH);
+  analogWrite(left_pwm, speed);
   digitalWrite(left_dir_1, LOW);
   digitalWrite(left_dir_2, HIGH);
 }
 
 void leftWheel::moveRight() {
-  digitalWrite(left_pwm, HIGH);
+  analogWrite(left_pwm, speed);
   digitalWrite(left_dir_1, HIGH);
   digitalWrite(left_dir_2, LOW);
 }

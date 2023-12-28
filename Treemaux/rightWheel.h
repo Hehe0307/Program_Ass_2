@@ -9,9 +9,10 @@ class rightWheel : public wheel
     void declarePin(); // For pin declaration
     void moveLeft(); // For turn left movmement
     void moveRight(); // For turn right movement 
-    void moveForward(); // For forward movmement 
+    void moveForward(); // For forward movmement
+    void moveReverse(); // For backward movement 
     void moveStop(); // For stopping robot movement
-    int speed; // Motor Speed
+    int speed;
   private:
     const int right_pwm; // PWM Pin
     const int right_dir_1; // Direction Pin 1

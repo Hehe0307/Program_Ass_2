@@ -5,15 +5,13 @@
 class robot
 {
   public:
-    robot(ultrasonic, ultrasonic, ultrasonic, leftWheel, rightWheel); // Constructor
+    robot(ultrasonic f, ultrasonic r, ultrasonic l, leftWheel lw, rightWheel rw); // Constructor
     void testFunctions();
     void solveMaze();
     void initializeMaze();
     void initialNewMaze();
     int Maze[12][12] = { 0 }; // Initiallize the maze with 0's
-    int visited[12][12] = { 0 }; // 0 as not visited, 1 as visited
-    // int NewMaze[26][26] = { 0 };
-    // int NewVisited[26][26] = { 0 }; // 0 as not visited, 1 as visited
+    bool visited[12][12] = { false }; // 0 as not visited, 1 as visited
   private:
     // Robot 'has a' Front, Right, Left, LeftWheel, RightWheel (Composition)
     ultrasonic Front; // Front HC-SR04 sensor

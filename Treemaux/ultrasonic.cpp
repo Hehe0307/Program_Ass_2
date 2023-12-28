@@ -9,7 +9,7 @@ void ultrasonic::declarePin() {
   pinMode(echoPin, INPUT);
 }
 
-long ultrasonic::retrieveData()
+void ultrasonic::retrieveData()
 {
   long duration;
   digitalWrite(trigPin, LOW);
@@ -18,5 +18,5 @@ long ultrasonic::retrieveData()
   delayMicroseconds(10); // this delay is required as well!
   digitalWrite(trigPin, LOW);
   duration = pulseIn(echoPin, HIGH);
-  return (duration / 58); // convert the distance  to centimeters.
+  data = duration * 0.0343 / 2;
 }
