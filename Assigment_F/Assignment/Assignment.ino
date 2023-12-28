@@ -186,43 +186,54 @@ void floodFillCode(int maze[SIZE][SIZE], int startRow, int startCol) {
   int dc[4] = { 0, 0, -1, 1 };
 
   // Set startRow and startCol to 6
+  // maze[startRow][startCol] = 0;
+  // maze[startRow-1][startCol] = 0;
+  // maze[startRow][startCol-1] = 0;
+  // maze[startRow-1][startCol-1] = 0;
+  startRow = 6;
+  startCol = 6;
   maze[startRow][startCol] = 0;
   maze[startRow-1][startCol] = 0;
   maze[startRow][startCol-1] = 0;
   maze[startRow-1][startCol-1] = 0;
 
   rowQueue.enqueue(startRow);
-  colQueue.enqueue(startCol);
-  rowQueue.enqueue(startRow - 1);
-  colQueue.enqueue(startCol);
-  rowQueue.enqueue(startRow);
-  colQueue.enqueue(startCol - 1);
-  rowQueue.enqueue(startRow - 1);
-  colQueue.enqueue(startCol - 1);
+  int Row = rowQueue.dequeue();
+  // colQueue.enqueue(startCol);
+  // rowQueue.enqueue(startRow - 1);
+  // colQueue.enqueue(startCol);
+  // rowQueue.enqueue(startRow);
+  // colQueue.enqueue(startCol - 1);
+  // rowQueue.enqueue(startRow - 1);
+  // colQueue.enqueue(startCol - 1);
 
-  while(!rowQueue.isEmptyQueue() && !colQueue.isEmptyQueue()) {
-    int Row = rowQueue.dequeue();
-    int Col = colQueue.dequeue();
+// int Row = rowQueue.dequeue();
+// int Col = colQueue.dequeue();
   
-    Serial.print("Row: "); Serial.print(Row); Serial.print("  Col: "); Serial.println(Col);
+     Serial.print("Row: "); Serial.print(Row); //Serial.print("  Col: "); Serial.println(Col);
+  // while(!rowQueue.isEmptyQueue() && !colQueue.isEmptyQueue()) {
+    // int Row = rowQueue.dequeue();
+    // int Col = colQueue.dequeue();
+  
+    // Serial.print("Row: "); Serial.print(Row); Serial.print("  Col: "); Serial.println(Col);
     
     //Dequeue the front position
 
-    for(int i = 0; i < 4; i++){
-      int newRow = Row + dr[i];
-      int newCol = Col + dc[i];
+    // for(int i = 0; i < 4; i++){
+    //   int newRow = Row + dr[i];
+    //   int newCol = Col + dc[i];
 
-      if(isValid(newRow, newCol) && maze[newRow][newCol] == -1){
-        maze[newRow][newCol] = 0;
-        maze[newRow][newCol]++;
+    //   if(isValid(newRow, newCol) && maze[newRow][newCol] == -1){
+    //     maze[newRow][newCol] = 0;
+    //     maze[newRow][newCol]++;
 
-        checkAvailableCode();
-      }
-    }
-  printMaze();
-  Serial.println();
-  }
-  Serial.println("floodFillCode done");
+    //     checkAvailableCode();
+    //   }
+    // }
+  // printMaze();
+  // Serial.println();
+  // }
+  // Serial.println("floodFillCode done");
 }
 
 // Check the shortest manhattan distance and set it to the next move
@@ -395,12 +406,12 @@ void enableTask() {
   executeMovement.enable(); //!!
   updateMaze.enable();
   // tunePosition.enable();
-  getLeftPulse.enable();
+  // getLeftPulse.enable();
   // getRightPulse.enable();
 
-  frontDetect.enable();
-  leftDetect.enable();
-  rightDetect.enable();
+  // frontDetect.enable();
+  // leftDetect.enable();
+  // rightDetect.enable();
 }
 
 void checkTask() {
@@ -412,12 +423,12 @@ void checkTask() {
   executeMovement.check(); //!!
   updateMaze.check();
   //tunePosition.check();
-  getLeftPulse.check();
+  //getLeftPulse.check();
   //getRightPulse.check();
 
-  frontDetect.check();
-  leftDetect.check();
-  rightDetect.check();
+  // frontDetect.check();
+  // leftDetect.check();
+  // rightDetect.check();
 }
 
 void setup() { 

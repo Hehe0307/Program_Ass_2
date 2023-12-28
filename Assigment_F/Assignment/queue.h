@@ -12,10 +12,11 @@ class queueType {
         int dequeue(); // To remove a data value into the queue
         int getFront();
         int getBack();
+        int *q;
 
     private:
         int maxQueueSize = 144, count, queueBack, queueFront; 
-        int *q;
+        
 };
 
 #endif
