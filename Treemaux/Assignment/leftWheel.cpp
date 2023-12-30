@@ -24,8 +24,8 @@ void leftWheel::moveReverse() {
 
 void leftWheel::moveStop() {
   analogWrite(left_pwm, 0);
-  digitalWrite(left_dir_1, HIGH);
-  digitalWrite(left_dir_2, LOW);
+  digitalWrite(left_dir_1, LOW);
+  digitalWrite(left_dir_2, HIGH);
 }
  
 void leftWheel::moveLeft() {
