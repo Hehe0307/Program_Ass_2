@@ -433,20 +433,20 @@ void getFrontGrid() {
 void getLeftGrid() {
   switch(direction) {
     case NORTH:
-      leftCellVisited[row][col] = myRobot.Maze[row-1][col];
-      leftCellJunction[row][col] = myRobot.visited[row-1][col];
+      leftCellVisited[row][col] = myRobot.Maze[row][col-1];
+      leftCellJunction[row][col] = myRobot.visited[row][col-1];
       break;
     case SOUTH:
-      leftCellVisited[row][col] = myRobot.Maze[row+1][col];
-      leftCellJunction[row][col] = myRobot.visited[row+1][col];
-      break;
-    case EAST:
       leftCellVisited[row][col] = myRobot.Maze[row][col+1];
       leftCellJunction[row][col] = myRobot.visited[row][col+1];
       break;
+    case EAST:
+      leftCellVisited[row][col] = myRobot.Maze[row-1][col];
+      leftCellJunction[row][col] = myRobot.visited[row-1][col+1];
+      break;
     case WEST:
-      leftCellVisited[row][col] = myRobot.Maze[row][col-1];
-      leftCellJunction[row][col] = myRobot.visited[row][col-1];
+      leftCellVisited[row][col] = myRobot.Maze[row+1][col];
+      leftCellJunction[row][col] = myRobot.visited[row+1][col];
       break;
     default: break;
   }
@@ -456,20 +456,20 @@ void getLeftGrid() {
 void getRightGrid() { 
   switch(direction) {
     case NORTH:
-      rightCellVisited[row][col] = myRobot.Maze[row-1][col];
-      rightCellJunction[row][col] = myRobot.visited[row-1][col];
-      break;
-    case SOUTH:
-      rightCellVisited[row][col] = myRobot.Maze[row+1][col];
-      rightCellJunction[row][col] = myRobot.visited[row+1][col];
-      break;
-    case EAST:
       rightCellVisited[row][col] = myRobot.Maze[row][col+1];
       rightCellJunction[row][col] = myRobot.visited[row][col+1];
       break;
-    case WEST:
+    case SOUTH:
       rightCellVisited[row][col] = myRobot.Maze[row][col-1];
       rightCellJunction[row][col] = myRobot.visited[row][col-1];
+      break;
+    case EAST:
+      rightCellVisited[row][col] = myRobot.Maze[row+1][col];
+      rightCellJunction[row][col] = myRobot.visited[row+1][col];
+      break;
+    case WEST:
+      rightCellVisited[row][col] = myRobot.Maze[row-1][col];
+      rightCellJunction[row][col] = myRobot.visited[row-1][col];
       break;
     default: break;
   }
