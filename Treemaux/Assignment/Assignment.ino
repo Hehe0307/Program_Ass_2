@@ -76,6 +76,25 @@ uint16_t rightCellJunction[12][12] = { 0 };
 // bool isEntry = false;
 // bool isExit = true;
 
+void initialiseWallMaze(){
+  for(int i = 0; i < SIZE; i++){
+    for(int j = 0; j < SIZE; j++){
+      No_Wall[i][j] = false;
+      North_Wall[i][j] = false;
+      South_Wall[i][j] = false;
+      East_Wall[i][j] = false;
+      West_Wall[i][j] = false;
+
+      frontCellVisited[i][j] = false;
+      leftCellVisited[i][j] = false;
+      rightCellVisited[i][j] = false;
+      frontCellJunction[i][j] = 0;
+      leftCellJunction[i][j] = 0;
+      rightCellJunction[i][j] = 0;
+    }
+  }
+}
+
 bool isValid(int row, int col) {
   return (row >= 0 && col >= 0 && row < SIZE && col < SIZE);
 }
@@ -151,7 +170,6 @@ void checkMovementCode() {
       pathType = DEAD_END;
       myRobot.Maze[row][col] = WALL; 
       switch(direction) {
-        //Why?
         case NORTH: { myRobot.visited[row+1][col] = false; myRobot.Maze[row+1][col] = 0; myRobot.visited[row][col] = false; }
         case SOUTH: { myRobot.visited[row-1][col] = false; myRobot.Maze[row-1][col] = 0; myRobot.visited[row][col] = false; }
         case EAST: { myRobot.visited[row][col-1] = false; myRobot.Maze[row][col-1] = 0; myRobot.visited[row][col] = false; }
@@ -356,7 +374,7 @@ void mazeMappingCode() {
         case EAST:
         case WEST:
           No_Wall[row][col] = true; 
-          break;
+          break; 
         default: break;
       }
       break;
@@ -498,11 +516,11 @@ void loop() {
   // Serial.print("Front Sensor: "); Serial.print(frontSensor.data); Serial.print("    ");
   // Serial.print("Left Sensor: "); Serial.print(leftSensor.data); Serial.print("    ");
   // Serial.print("Right Sensor: "); Serial.print(rightSensor.data); Serial.println("    ");
-  // Serial.print("Front IR sensor: "); Serial.print(IRFront.status); Serial.println("    ");
-  // Serial.print("Right IR sensor: "); Serial.print(IRRight.status); Serial.println("    ");
-  // Serial.print("Left IR sensor: "); Serial.print(IRLeft.status); Serial.println("    ");
+  // Ser ft IR sensor: "); Serial.print(IRLeft.status); Serial.println("    ");
   // myRobot.testFunctions();
-  // myRobot.IRsolveMaze();
+  initialiseWallMaze();
+  myRobot.initialiseMaze();
+  myRobot.IRsolveMaze();
   // frontDetect.check();
   // leftDetect.check();
   // rightDetect.check();
