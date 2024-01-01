@@ -67,6 +67,17 @@ int col = 0;
 int row_num = 0;
 int col_num = 0;
 
+int error = 0;
+int prevError = 0;
+int derivative = 0;
+int integral = 0;
+int integralLimit = 500;
+int PIDOutputVal = 0;
+int PIDOutputMax = 40;
+int kp = 100;
+int ki = 0;
+int kd = 0;
+
 bool No_Wall[12][12];
 bool North_Wall[12][12];
 bool South_Wall[12][12];
@@ -135,7 +146,55 @@ void rightIRCode() { IRRight.retrieveData(); }
 
 // ***
 void PIDTaskCode() {
+  if (leftSensor.data >= SIDE_DIST_THRESH){
+    error = 35 - rightSensor.data;
+  }
+  
+  else if (rightSensor.data >=SIDE_DIST_THRESH){
+    error = leftSensor.data - 35;
+  }
 
+  else if (leftSensor.data >= SIDE_DIST_THRESH && rightSensor.data >=SIDE_DIST_THRESH){
+    return;
+  }
+
+  else {
+    error = leftSensor.data - rightSensor.data;
+  }
+  
+  if(error >= -5 && error <= 5){
+    PIDOutputVal = 0;
+  }
+
+  else {
+    derivative = (error - prevError);
+    integral += (5 * (error + prevError));
+
+    if (integral > integralLimit){
+      integral = integralLimit;
+    }
+    
+    else if (integral < -(integralLimit)){
+      integral = -(integralLimit);
+    }
+
+    PIDOutputVal = (kp * error + ki * integral + kd * derivative) / 1000;
+  }
+
+  if (PIDOutputVal > PIDOutputMax){
+    PIDOutputVal = PIDOutputMax;
+  }
+
+  else if (PIDOutputVal > -(PIDOutputMax)){
+    PIDOutputVal = -(PIDOutputMax);
+  }
+
+  cli();
+  leftWheelObj.speed = leftWheelObj.speed - PIDOutputVal;
+  rightWheelObj.speed = rightWheelObj.speed + PIDOutputVal;
+  sei();
+
+  prevError = error;
 }
 // ***
 
@@ -311,11 +370,11 @@ void checkMovementCode() {
           break;
         case SOUTH:
           if(refMaze[row+1][col] <= refMaze[row][col-1] && refMaze[row+1][col] <= refMaze[row][col+1]) { movement = FORWARD; }
-          if(refMaze[row][col+1] <= refMaze[row-1][col] && refMaze[row][col+1] <= refMaze[row][col-1]) { movement = LEFT; }
-          if(refMaze[row][col-1] <= refMaze[row-1][col] && refMaze[row][col-1] <= refMaze[row][col+1]) { movement = RIGHT; }
+          if(refMaze[row][col+1] <= refMaze[row+1][col] && refMaze[row][col+1] <= refMaze[row][col-1]) { movement = LEFT; }
+          if(refMaze[row][col-1] <= refMaze[row+1][col] && refMaze[row][col-1] <= refMaze[row][col+1]) { movement = RIGHT; }
           break;
         case EAST:
-          if(refMaze[row][col+1] <= refMaze[row-1][col] && refMaze[row][col+1] <= refMaze[row-1][col]) { movement = FORWARD; }
+          if(refMaze[row][col+1] <= refMaze[row-1][col] && refMaze[row][col+1] <= refMaze[row+1][col]) { movement = FORWARD; }
           if(refMaze[row-1][col] <= refMaze[row][col+1] && refMaze[row-1][col] <= refMaze[row+1][col]) { movement = LEFT; }
           if(refMaze[row+1][col] <= refMaze[row-1][col] && refMaze[row+1][col] <= refMaze[row][col+1]) { movement = RIGHT; }
           break;

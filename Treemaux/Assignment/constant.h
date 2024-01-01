@@ -24,7 +24,7 @@
 
 // Constants
 #define DIST_THRESH 12
-#define SIDE_DIST_THRESH 5
+#define SIDE_DIST_THRESH 35
 #define PULSE_PER_GRID 24
 #define SIZE 12
 #define TASK_INTERVAL 1000
