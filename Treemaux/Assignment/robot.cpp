@@ -117,7 +117,7 @@ void robot::IRsolveMaze() {
     FrontIR.retrieveData();
     LeftIR.retrieveData();
     RightIR.retrieveData();
-    if (!FrontIR.status && LeftIR.status && RightIR.status) { // left & right have obstacles but front is clear
+    if (!FrontIR.status && LeftIR.status && RightIR.status) { // left & right have obstacles but front is clear, Forward
       LeftWheel.moveForward();
       RightWheel.moveForward(); 
       Serial.println("Forward");
@@ -126,7 +126,7 @@ void robot::IRsolveMaze() {
     else if (FrontIR.status && LeftIR.status && RightIR.status) { // obstacle in front of all 3 sides, reverse
       LeftWheel.moveReverse();
       RightWheel.moveReverse();
-      Serial.println("Reverse");
+      Serial.println("Backward");
       delay(100);
     }
     else if (FrontIR.status && !LeftIR.status && RightIR.status) { // obstacle on right and front sides, turn left side 
