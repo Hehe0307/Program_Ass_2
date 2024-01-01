@@ -2,7 +2,7 @@
 #define LEFT_PWM A3
 #define LEFT_DIR_1 29
 #define LEFT_DIR_2 31
-#define RIGHT_PWM A5
+#define RIGHT_PWM A1
 #define RIGHT_DIR_1 28
 #define RIGHT_DIR_2 30
 
@@ -33,7 +33,7 @@ enum {
   FORWARD,
   LEFT,
   RIGHT,
-  REVERSE,
+  BACKWARD,
   STOP
 } movement;
 

@@ -1,7 +1,9 @@
-//Group 10
-//Members: Eng Chee Wen 22050762/1  Lee Yi Jia 22004570/1  Lai Zhe Jun S2182269/1  Chong Wei Jie 22054152/1
+// Group 10
+// Members: Eng Chee Wen 22050762/1  Lee Yi Jia 22004570/1  Lai Zhe Jun S2182269/1  Chong Wei Jie 22054152/1
 
+// Include neccessary libraries & header files 
 #include <TimedAction.h>
+#include <PID_v1.h>
 #include "constant.h"
 #include "ultrasonic.h"
 #include "wheel.h"
@@ -10,6 +12,7 @@
 #include "IR.h"
 #include "robot.h"
 
+// Object Declaration
 leftWheel leftWheelObj(LEFT_PWM, LEFT_DIR_1, LEFT_DIR_2, 130);
 rightWheel rightWheelObj(RIGHT_PWM, RIGHT_DIR_1, RIGHT_DIR_2, 130);
 ultrasonic frontSensor(FRONT_TRIG, FRONT_ECHO);
@@ -20,39 +23,42 @@ IR IRLeft(LEFT_IR);
 IR IRRight(RIGHT_IR);
 robot myRobot(frontSensor, rightSensor, leftSensor, leftWheelObj, rightWheelObj, IRFront, IRLeft, IRRight);
 
+// Function Prototypes
+void initializeWallMaze();
 void GetLeftPulseTaskCode();
 void GetRightPulseTaskCode();
 void checkMovementCode();
 void executeMovementCode();
 void updateMazeCode();
-// void frontDetectCode();
-// void leftDetectCode();
-// void rightDetectCode();
 void frontIRCode();
 void leftIRCode();
 void rightIRCode();
+void frontDetectCode();
+void leftDetectCode();
+void rightDetectCode();
 void mazeMappingCode();
 void getFrontGrid();
 void getLeftGrid();
 void getRightGrid();
+void PIDTaskCode();
 
+// TimedAction Functions Declaration
 TimedAction GetLeftPulseTask = TimedAction(1, GetLeftPulseTaskCode);
 TimedAction GetRightPulseTask = TimedAction(TASK_INTERVAL, GetRightPulseTaskCode);
 TimedAction checkMovement = TimedAction(TASK_INTERVAL, checkMovementCode);
-TimedAction executeMovement = TimedAction(1000, executeMovementCode);
+TimedAction executeMovement = TimedAction(TASK_INTERVAL, executeMovementCode);
 TimedAction updateMaze = TimedAction(TASK_INTERVAL, updateMazeCode);
-// TimedAction frontDetect = TimedAction(TASK_INTERVAL, frontDetectCode);
-// TimedAction leftDetect = TimedAction(TASK_INTERVAL, leftDetectCode);
-// TimedAction rightDetect = TimedAction(TASK_INTERVAL, rightDetectCode);
-
 TimedAction frontIRDetect = TimedAction(TASK_INTERVAL, frontIRCode);
 TimedAction leftIRDetect = TimedAction(TASK_INTERVAL, leftIRCode);
 TimedAction rightIRDetect = TimedAction(TASK_INTERVAL, rightIRCode);
-
+TimedAction frontDetect = TimedAction(TASK_INTERVAL, frontDetectCode);    // ***
+TimedAction leftDetect = TimedAction(TASK_INTERVAL, leftDetectCode);      // ***
+TimedAction rightDetect = TimedAction(TASK_INTERVAL, rightDetectCode);    // ***
 TimedAction mazeMapping = TimedAction(TASK_INTERVAL, mazeMappingCode);
 TimedAction getFront = TimedAction(TASK_INTERVAL, getFrontGrid);
 TimedAction getLeft = TimedAction(TASK_INTERVAL, getLeftGrid);
 TimedAction getRight = TimedAction(TASK_INTERVAL, getRightGrid);
+TimedAction PIDTask = TimedAction(TASK_INTERVAL, PIDTaskCode);            // ***
 
 volatile uint32_t leftPulse = 0;
 volatile uint32_t rightPulse = 0;
@@ -61,30 +67,40 @@ int col = 0;
 int row_num = 0;
 int col_num = 0;
 
-bool No_Wall[12][12] = { false };
-bool North_Wall[12][12] = { false };
-bool South_Wall[12][12] = { false };
-bool East_Wall[12][12] = { false };
-bool West_Wall[12][12] = { false };
+bool No_Wall[12][12];
+bool North_Wall[12][12];
+bool South_Wall[12][12];
+bool East_Wall[12][12];
+bool West_Wall[12][12];
+bool frontCellVisited[12][12];
+bool leftCellVisited[12][12];
+bool rightCellVisited[12][12];
+uint16_t frontCellJunction[12][12];
+uint16_t leftCellJunction[12][12];
+uint16_t rightCellJunction[12][12];
+const int refMaze[SIZE][SIZE] = {
+  {10, 9, 8, 7, 6, 5, 5, 6, 7, 8, 9, 10},
+  {9, 8, 7, 6, 5, 4, 4, 5, 6, 7, 8, 9},
+  {8, 7, 6, 5, 4, 3, 3, 4, 5, 6, 7, 8},
+  {7, 6, 5, 4, 3, 2, 2, 3, 4, 5, 6, 7},
+  {6, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 6},
+  {5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5},
+  {5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5},
+  {6, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 6},
+  {7, 6, 5, 4, 3, 2, 2, 3, 4, 5, 6, 7},
+  {8, 7, 6, 5, 4, 3, 3, 4, 5, 6, 7, 8},
+  {9, 8, 7, 6, 5, 4, 4, 5, 6, 7, 8, 9},
+  {10, 9, 8, 7, 6, 5, 5, 6, 7, 8, 9, 10}
+};
 
-bool frontCellVisited[12][12] = { false };
-bool leftCellVisited[12][12] = { false };
-bool rightCellVisited[12][12] = { false };
-uint16_t frontCellJunction[12][12] = { 0 };
-uint16_t leftCellJunction[12][12] = { 0 };
-uint16_t rightCellJunction[12][12] = { 0 };
-// bool isEntry = false;
-// bool isExit = true;
-
-void initialiseWallMaze(){
-  for(int i = 0; i < SIZE; i++){
-    for(int j = 0; j < SIZE; j++){
+void initializeWallMaze() {
+  for(int i = 0; i < SIZE; i++) {
+    for(int j = 0; j < SIZE; j++) {
       No_Wall[i][j] = false;
       North_Wall[i][j] = false;
       South_Wall[i][j] = false;
       East_Wall[i][j] = false;
       West_Wall[i][j] = false;
-
       frontCellVisited[i][j] = false;
       leftCellVisited[i][j] = false;
       rightCellVisited[i][j] = false;
@@ -117,6 +133,12 @@ void leftIRCode() { IRLeft.retrieveData(); }
 
 void rightIRCode() { IRRight.retrieveData(); }
 
+// ***
+void PIDTaskCode() {
+
+}
+// ***
+
 //Update the maze based on encoder reading
 void updateMazeCode() {
   if(isValid(row, col)) {
@@ -135,18 +157,30 @@ void updateMazeCode() {
     }
     case LEFT:
     case RIGHT:
-    case REVERSE:
       { leftPulse = 0; break; }
+    case BACKWARD: {
+      switch(direction) {
+        case NORTH:
+          { if(leftPulse >= PULSE_PER_GRID) { row_num = leftPulse / PULSE_PER_GRID; row+=row_num; leftPulse = 0; myRobot.visited[row][col] = true; break; } }
+        case SOUTH:
+          { if(leftPulse >= PULSE_PER_GRID) { row_num = leftPulse / PULSE_PER_GRID; row-=row_num; leftPulse = 0; myRobot.visited[row][col] = true; break; } }
+        case WEST:
+          { if(leftPulse >= PULSE_PER_GRID) { col_num = leftPulse / PULSE_PER_GRID; col+=col_num; leftPulse = 0; myRobot.visited[row][col] = true; break; } }
+        case EAST:
+          { if(leftPulse >= PULSE_PER_GRID) { col_num = leftPulse / PULSE_PER_GRID; col-=col_num; leftPulse = 0; myRobot.visited[row][col] = true; break; } }
+      }
+    }
     }
   }
   Serial.print("Row: "); Serial.print(row); Serial.print("     "); Serial.print("Col: "); Serial.println(col); 
 }
 
-//Check for wall
+// Check for wall
 void checkMovementCode() {
+  // For Ultrasonic Sensor
   // if(isValid(row, col)) {
   //   if(frontSensor.data < DIST_THRESH && rightSensor.data < DIST_THRESH && leftSensor.data < DIST_THRESH) { // dead end
-  //     movement = REVERSE; 
+  //     movement = BACKWARD; 
   //     myRobot.Maze[row][col] = WALL; 
   //     switch(direction) {
   //       case NORTH: { myRobot.Maze[row+1][col] = 0; }
@@ -164,25 +198,135 @@ void checkMovementCode() {
   //   else { movement = FORWARD; } // no obstacle ahead 
   // }
 
+  // For IR Sensor
   if(isValid(row, col)) {
     if(IRFront.status && IRLeft.status && IRRight.status) { // dead end
-      movement = REVERSE; 
+      movement = BACKWARD; 
       pathType = DEAD_END;
       myRobot.Maze[row][col] = WALL; 
       switch(direction) {
-        case NORTH: { myRobot.visited[row+1][col] = false; myRobot.Maze[row+1][col] = 0; myRobot.visited[row][col] = false; }
-        case SOUTH: { myRobot.visited[row-1][col] = false; myRobot.Maze[row-1][col] = 0; myRobot.visited[row][col] = false; }
-        case EAST: { myRobot.visited[row][col-1] = false; myRobot.Maze[row][col-1] = 0; myRobot.visited[row][col] = false; }
-        case WEST: { myRobot.visited[row][col+1] = false; myRobot.Maze[row][col+1] = 0; myRobot.visited[row][col] = false; }
+        case NORTH: { myRobot.visited[row+1][col] = false; myRobot.Maze[row+1][col] = 0; myRobot.visited[row][col] = true; }
+        case SOUTH: { myRobot.visited[row-1][col] = false; myRobot.Maze[row-1][col] = 0; myRobot.visited[row][col] = true; }
+        case EAST: { myRobot.visited[row][col-1] = false; myRobot.Maze[row][col-1] = 0; myRobot.visited[row][col] = true; }
+        case WEST: { myRobot.visited[row][col+1] = false; myRobot.Maze[row][col+1] = 0; myRobot.visited[row][col] = true; }
       }
     } 
-    else if(!IRFront.status && IRLeft.status && IRRight.status) { movement = FORWARD; pathType = STRAIGHT_LEFT_RIGHT; } // obstacle at left & right
-    else if(IRFront.status && !IRLeft.status && IRRight.status) { movement = LEFT; pathType = RIGHT_CORNER; } // obstacle at front & right
-    else if(IRFront.status && IRLeft.status && !IRRight.status) { movement = RIGHT; pathType = LEFT_CORNER; } // obstacle at front & left
-    else if(IRFront.status && !IRLeft.status && !IRRight.status) { movement = LEFT; pathType = T_JUNCTION; } // obstacle at front
-    else if(!IRFront.status && IRLeft.status && !IRRight.status) { movement = FORWARD; pathType = STRAIGHT_LEFT; } // obstacle at left
-    else if(!IRFront.status && !IRLeft.status && IRRight.status) { movement = FORWARD; pathType = STRAIGHT_RIGHT;} // obstacle at right
-    else { movement = FORWARD; pathType = STRAIGHT_LEFT_RIGHT; } // no obstacle ahead 
+    else if(!IRFront.status && IRLeft.status && IRRight.status) { // obstacle at left & right
+      pathType = STRAIGHT_LEFT_RIGHT;
+      movement = FORWARD;  
+    }
+    else if(IRFront.status && !IRLeft.status && IRRight.status) { // obstacle at front & right
+      pathType = RIGHT_CORNER; 
+      movement = LEFT; 
+    } 
+    else if(IRFront.status && IRLeft.status && !IRRight.status) { // obstacle at front & left
+      pathType = LEFT_CORNER; 
+      movement = RIGHT; 
+    } 
+    else if(IRFront.status && !IRLeft.status && !IRRight.status) { // obstacle at front
+      pathType = T_JUNCTION;
+      switch(direction) {
+        case NORTH:
+          if(refMaze[row][col-1] > refMaze[row][col+1]) { movement = RIGHT; }
+          if(refMaze[row][col-1] < refMaze[row][col+1]) { movement = LEFT; }
+          if(refMaze[row][col-1] == refMaze[row][col+1]) { movement = LEFT; } // if equal, prioritize turn left
+          break;
+        case SOUTH:
+          if(refMaze[row][col-1] > refMaze[row][col+1]) { movement = LEFT; }
+          if(refMaze[row][col-1] < refMaze[row][col+1]) { movement = RIGHT; }
+          if(refMaze[row][col-1] == refMaze[row][col+1]) { movement = LEFT; } // if equal, prioritize turn left
+          break;
+        case EAST:
+          if(refMaze[row-1][col] > refMaze[row+1][col]) { movement = RIGHT; }
+          if(refMaze[row-1][col] < refMaze[row+1][col]) { movement = LEFT; }
+          if(refMaze[row-1][col] == refMaze[row+1][col]) { movement = LEFT; } // if equal, prioritize turn left
+          break;
+        case WEST:
+          if(refMaze[row-1][col] > refMaze[row+1][col]) { movement = LEFT; }
+          if(refMaze[row-1][col] < refMaze[row+1][col]) { movement = RIGHT; }
+          if(refMaze[row-1][col] == refMaze[row+1][col]) { movement = LEFT; } // if equal, prioritize turn left
+          break;
+        default: { movement = LEFT; break; }
+      }
+    } 
+    else if(!IRFront.status && IRLeft.status && !IRRight.status) { // obstacle at left
+      pathType = STRAIGHT_LEFT;
+      switch(direction) {
+        case NORTH:
+          if(refMaze[row-1][col] > refMaze[row][col+1]) { movement = RIGHT; }
+          if(refMaze[row-1][col] < refMaze[row][col+1]) { movement = FORWARD; }
+          if(refMaze[row-1][col] == refMaze[row][col+1]) { movement = FORWARD; } // if equal, prioritize move forward
+          break;
+        case SOUTH:
+          if(refMaze[row+1][col] > refMaze[row][col-1]) { movement = RIGHT; }
+          if(refMaze[row+1][col] < refMaze[row][col-1]) { movement = FORWARD; }
+          if(refMaze[row+1][col] == refMaze[row][col-1]) { movement = FORWARD; } // if equal, prioritize move forward
+          break;
+        case EAST:
+          if(refMaze[row][col+1] > refMaze[row+1][col]) { movement = RIGHT; }
+          if(refMaze[row][col+1] < refMaze[row+1][col]) { movement = FORWARD; }
+          if(refMaze[row][col+1] == refMaze[row+1][col]) { movement = FORWARD; } // if equal, prioritize move forward
+          break;
+        case WEST:
+          if(refMaze[row][col-1] > refMaze[row-1][col]) { movement = RIGHT; }
+          if(refMaze[row][col-1] < refMaze[row-1][col]) { movement = FORWARD; }
+          if(refMaze[row][col-1] == refMaze[row-1][col]) { movement = FORWARD; } // if equal, prioritize move forward
+          break;
+        default: { movement = RIGHT; break; }
+      }
+    } 
+    else if(!IRFront.status && !IRLeft.status && IRRight.status) { // obstacle at right
+      pathType = STRAIGHT_RIGHT;
+      switch(direction) {
+        case NORTH:
+          if(refMaze[row-1][col] > refMaze[row][col-1]) { movement = LEFT; }
+          if(refMaze[row-1][col] < refMaze[row][col-1]) { movement = FORWARD; }
+          if(refMaze[row-1][col] == refMaze[row][col-1]) { movement = FORWARD; } // if equal, prioritize move forward
+          break;
+        case SOUTH:
+          if(refMaze[row+1][col] > refMaze[row][col+1]) { movement = LEFT; }
+          if(refMaze[row+1][col] < refMaze[row][col+1]) { movement = FORWARD; }
+          if(refMaze[row+1][col] == refMaze[row][col+1]) { movement = FORWARD; } // if equal, prioritize move forward
+          break;
+        case EAST:
+          if(refMaze[row][col+1] > refMaze[row-1][col]) { movement = LEFT; }
+          if(refMaze[row][col+1] < refMaze[row-1][col]) { movement = FORWARD; }
+          if(refMaze[row][col+1] == refMaze[row-1][col]) { movement = FORWARD; } // if equal, prioritize move forward
+          break;
+        case WEST:
+          if(refMaze[row][col-1] > refMaze[row+1][col]) { movement = LEFT; }
+          if(refMaze[row][col-1] < refMaze[row+1][col]) { movement = FORWARD; }
+          if(refMaze[row][col-1] == refMaze[row+1][col]) { movement = FORWARD; } // if equal, prioritize move forward
+          break;
+        default: { movement = FORWARD; break; }
+      }
+    } 
+    else { // no obstacle ahead 
+      pathType = STRAIGHT_LEFT_RIGHT;
+      switch(direction) {
+        case NORTH:
+          if(refMaze[row-1][col] <= refMaze[row][col-1] && refMaze[row-1][col] <= refMaze[row][col+1]) { movement = FORWARD; }
+          if(refMaze[row][col-1] <= refMaze[row-1][col] && refMaze[row][col-1] <= refMaze[row][col+1]) { movement = LEFT; }
+          if(refMaze[row][col+1] <= refMaze[row-1][col] && refMaze[row][col+1] <= refMaze[row][col-1]) { movement = RIGHT; }
+          break;
+        case SOUTH:
+          if(refMaze[row+1][col] <= refMaze[row][col-1] && refMaze[row+1][col] <= refMaze[row][col+1]) { movement = FORWARD; }
+          if(refMaze[row][col+1] <= refMaze[row-1][col] && refMaze[row][col+1] <= refMaze[row][col-1]) { movement = LEFT; }
+          if(refMaze[row][col-1] <= refMaze[row-1][col] && refMaze[row][col-1] <= refMaze[row][col+1]) { movement = RIGHT; }
+          break;
+        case EAST:
+          if(refMaze[row][col+1] <= refMaze[row-1][col] && refMaze[row][col+1] <= refMaze[row-1][col]) { movement = FORWARD; }
+          if(refMaze[row-1][col] <= refMaze[row][col+1] && refMaze[row-1][col] <= refMaze[row+1][col]) { movement = LEFT; }
+          if(refMaze[row+1][col] <= refMaze[row-1][col] && refMaze[row+1][col] <= refMaze[row][col+1]) { movement = RIGHT; }
+          break;
+        case WEST:
+          if(refMaze[row][col-1] <= refMaze[row-1][col] && refMaze[row][col-1] <= refMaze[row+1][col]) { movement = FORWARD; }
+          if(refMaze[row+1][col] <= refMaze[row-1][col] && refMaze[row+1][col] <= refMaze[row][col-1]) { movement = LEFT; }
+          if(refMaze[row-1][col] <= refMaze[row][col-1] && refMaze[row-1][col] <= refMaze[row+1][col]) { movement = RIGHT; }
+          break;
+        default: { movement = FORWARD; break; }
+      }
+    } 
   }
 }
 
@@ -198,46 +342,46 @@ void executeMovementCode() {
         break;
      }
       case LEFT: {
-        checkMovement.disable();
-        leftPulse = 0;
-        // rightPulse = 0;
-        while(leftPulse < 11) {
+        // checkMovement.disable();
+        // leftPulse = 0;
+        // // rightPulse = 0;
+        // while(leftPulse < 11) {
           leftWheelObj.moveLeft();
           rightWheelObj.moveLeft();
           Serial.println("Left"); 
-        }
-        leftPulse = 0;
+        // }
+        // leftPulse = 0;
         // rightPulse = 0;        
         if(direction == NORTH) { direction = WEST; }
         else if(direction == SOUTH) { direction = EAST; }
         else if(direction == WEST) { direction = SOUTH; }
         else { direction = NORTH; }
-        checkMovement.enable();
+        // checkMovement.enable();
         break;
       }
 
       case RIGHT: {
-        checkMovement.disable();
-        leftPulse = 0;
-        // rightPulse = 0;
-        while (leftPulse < 11) {
+        // checkMovement.disable();
+        // leftPulse = 0;
+        // // rightPulse = 0;
+        // while (leftPulse < 11) {
           leftWheelObj.moveRight();
           rightWheelObj.moveRight();
           Serial.println("Right");
-        }
-        leftPulse = 0;
+        // }
+        // leftPulse = 0;
         // rightPulse = 0;
         if(direction == NORTH) { direction = EAST; }
         else if(direction == SOUTH) { direction = WEST; }
         else if(direction == WEST) { direction = NORTH; }
         else { direction = SOUTH; }
-        checkMovement.enable();
+        // checkMovement.enable();
         break;
       }
-      case REVERSE: {
+      case BACKWARD: {
         leftWheelObj.moveReverse();
         rightWheelObj.moveReverse();
-        Serial.println("Reverse");
+        Serial.println("BACKWARD");
         if(direction == NORTH) { direction = SOUTH; }
         else if(direction == SOUTH) { direction = NORTH; }
         else if(direction == WEST) { direction = EAST; }
@@ -374,7 +518,7 @@ void mazeMappingCode() {
         case EAST:
         case WEST:
           No_Wall[row][col] = true; 
-          break; 
+          break;
         default: break;
       }
       break;
@@ -406,7 +550,7 @@ void mazeMappingCode() {
   }
 }
 
-//Get the front grid coordinate
+// Get the front grid coordinate
 void getFrontGrid() {
   switch(direction) {
     case NORTH:
@@ -429,7 +573,7 @@ void getFrontGrid() {
   }
 }
 
-//Get the left grid coordinate
+// Get the left grid coordinate
 void getLeftGrid() {
   switch(direction) {
     case NORTH:
@@ -442,7 +586,7 @@ void getLeftGrid() {
       break;
     case EAST:
       leftCellVisited[row][col] = myRobot.Maze[row-1][col];
-      leftCellJunction[row][col] = myRobot.visited[row-1][col+1];
+      leftCellJunction[row][col] = myRobot.visited[row-1][col];
       break;
     case WEST:
       leftCellVisited[row][col] = myRobot.Maze[row+1][col];
@@ -452,7 +596,7 @@ void getLeftGrid() {
   }
 }
 
-//Get the right grid coordinate
+// Get the right grid coordinate
 void getRightGrid() { 
   switch(direction) {
     case NORTH:
@@ -477,14 +621,16 @@ void getRightGrid() {
 
 void setup() { 
   Serial.begin(9600);
+  myRobot.initializeMaze();
+  initializeWallMaze();
   movement = FORWARD;
   direction = NORTH;
-  // Serial.println(row);
+  Serial.print("Initial Row: "); Serial.print(row); Serial.print("     "); Serial.print("Initial Col: "); Serial.println(col); 
   leftWheelObj.declarePin();
   rightWheelObj.declarePin();
-  // frontSensor.declarePin();
-  // rightSensor.declarePin();
-  // leftSensor.declarePin();
+  frontSensor.declarePin();
+  rightSensor.declarePin();
+  leftSensor.declarePin();
   IRFront.declarePin();
   IRLeft.declarePin();
   IRRight.declarePin();
@@ -493,9 +639,9 @@ void setup() {
   pinMode(RIGHT_ENC, INPUT);
   attachInterrupt(digitalPinToInterrupt(RIGHT_ENC), rightCounter, RISING);
 
-  // frontDetect.enable();
-  // leftDetect.enable();
-  // rightDetect.enable();
+  frontDetect.enable();
+  leftDetect.enable();
+  rightDetect.enable();
   GetLeftPulseTask.enable();
   GetRightPulseTask.enable();
   checkMovement.enable();
@@ -508,6 +654,7 @@ void setup() {
   getFront.enable();
   getLeft.enable();
   getRight.enable();
+  PIDTask.enable();
 }
 
 void loop() {
@@ -516,14 +663,15 @@ void loop() {
   // Serial.print("Front Sensor: "); Serial.print(frontSensor.data); Serial.print("    ");
   // Serial.print("Left Sensor: "); Serial.print(leftSensor.data); Serial.print("    ");
   // Serial.print("Right Sensor: "); Serial.print(rightSensor.data); Serial.println("    ");
-  // Ser ft IR sensor: "); Serial.print(IRLeft.status); Serial.println("    ");
+  // Serial.print("Front IR sensor: "); Serial.print(IRFront.status); Serial.println("    ");
+  // Serial.print("Right IR sensor: "); Serial.print(IRRight.status); Serial.println("    ");
+  // Serial.print("Left IR sensor: "); Serial.print(IRLeft.status); Serial.println("    ");
   // myRobot.testFunctions();
-  initialiseWallMaze();
-  myRobot.initialiseMaze();
+  // myRobot.solveMaze();
+  frontDetect.check();
+  leftDetect.check();
+  rightDetect.check();
   myRobot.IRsolveMaze();
-  // frontDetect.check();
-  // leftDetect.check();
-  // rightDetect.check();
   frontIRDetect.check();
   leftIRDetect.check();
   rightIRDetect.check();
@@ -536,4 +684,5 @@ void loop() {
   getFront.check();
   getLeft.check();
   getRight.check();
+  PIDTask.check();
 }

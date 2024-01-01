@@ -9,8 +9,7 @@ void ultrasonic::declarePin() {
   pinMode(echoPin, INPUT);
 }
 
-void ultrasonic::retrieveData()
-{
+void ultrasonic::retrieveData() {
   long duration;
   digitalWrite(trigPin, LOW);
   delayMicroseconds(2); // delays are required for a succesful sensor operation.
@@ -18,5 +17,5 @@ void ultrasonic::retrieveData()
   delayMicroseconds(10); // this delay is required as well!
   digitalWrite(trigPin, LOW);
   duration = pulseIn(echoPin, HIGH);
-  data = duration * 0.0343 / 2;
+  data = duration * 0.343 / 2;
 }
