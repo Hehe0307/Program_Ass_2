@@ -39,9 +39,11 @@ void mazeMappingCode();
 void getFrontGrid();
 void getLeftGrid();
 void getRightGrid();
+void TuningTaskCode();
 void PIDTaskCode();
 void ForwardTaskCode();
-void TuningTaskCode();
+void leftAverageValCode();
+void rightAverageValCode();
 
 // TimedAction Functions Declaration
 TimedAction GetLeftPulseTask = TimedAction(1, GetLeftPulseTaskCode);
@@ -52,16 +54,18 @@ TimedAction updateMaze = TimedAction(TASK_INTERVAL, updateMazeCode);
 TimedAction frontIRDetect = TimedAction(TASK_INTERVAL, frontIRCode);
 TimedAction leftIRDetect = TimedAction(TASK_INTERVAL, leftIRCode);
 TimedAction rightIRDetect = TimedAction(TASK_INTERVAL, rightIRCode);
-TimedAction frontDetect = TimedAction(50, frontDetectCode);
-TimedAction leftDetect = TimedAction(50, leftDetectCode);
-TimedAction rightDetect = TimedAction(50, rightDetectCode);
+TimedAction frontDetect = TimedAction(PID_TASK_INTERVAL, frontDetectCode);
+TimedAction leftDetect = TimedAction(PID_TASK_INTERVAL, leftDetectCode);
+TimedAction rightDetect = TimedAction(PID_TASK_INTERVAL, rightDetectCode);
 TimedAction mazeMapping = TimedAction(TASK_INTERVAL, mazeMappingCode);
 TimedAction getFront = TimedAction(TASK_INTERVAL, getFrontGrid);
 TimedAction getLeft = TimedAction(TASK_INTERVAL, getLeftGrid);
 TimedAction getRight = TimedAction(TASK_INTERVAL, getRightGrid);
+TimedAction TuningTask = TimedAction(PID_TASK_INTERVAL, TuningTaskCode);
 TimedAction PIDTask = TimedAction(TASK_INTERVAL, PIDTaskCode);
 TimedAction ForwardTask = TimedAction(TASK_INTERVAL, ForwardTaskCode);
-TimedAction TuningTask = TimedAction(50, TuningTaskCode);
+TimedAction leftAverageVal = TimedAction(PID_TASK_INTERVAL, leftAverageValCode);
+TimedAction rightAverageVal = TimedAction(PID_TASK_INTERVAL, rightAverageValCode);
 
 volatile uint32_t leftPulse = 0;
 volatile uint32_t rightPulse = 0;
@@ -70,8 +74,17 @@ int col = 0;
 int row_num = 0;
 int col_num = 0;
 
-long leftAverage = 0;
-long rightAverage = 0;
+bool leftUsable = false;
+bool rightUsable = false;
+int leftCount = 0;
+int rightCount = 0;
+float leftAverage = 0.0;
+float rightAverage = 0.0;
+int iLeft = 0;
+int iRight = 0;
+long arrLeft[PID_SIZE];
+long arrRight[PID_SIZE];
+
 int error = 0;
 int prevError = 0;
 int derivative = 0;
@@ -95,18 +108,19 @@ uint16_t frontCellJunction[SIZE][SIZE];
 uint16_t leftCellJunction[SIZE][SIZE];
 uint16_t rightCellJunction[SIZE][SIZE];
 const int refMaze[SIZE][SIZE] = {
-  { 10, 9, 8, 7, 6, 5, 5, 6, 7, 8, 9, 10 },
-  { 9, 8, 7, 6, 5, 4, 4, 5, 6, 7, 8, 9 },
-  { 8, 7, 6, 5, 4, 3, 3, 4, 5, 6, 7, 8 },
-  { 7, 6, 5, 4, 3, 2, 2, 3, 4, 5, 6, 7 },
-  { 6, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 6 },
-  { 5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5 },
-  { 5, 4, 3, 2, 1, 0, 0, 1, 2, 3, 4, 5 },
-  { 6, 5, 4, 3, 2, 1, 1, 2, 3, 4, 5, 6 },
-  { 7, 6, 5, 4, 3, 2, 2, 3, 4, 5, 6, 7 },
-  { 8, 7, 6, 5, 4, 3, 3, 4, 5, 6, 7, 8 },
-  { 9, 8, 7, 6, 5, 4, 4, 5, 6, 7, 8, 9 },
-  { 10, 9, 8, 7, 6, 5, 5, 6, 7, 8, 9, 10 }
+  { 12, 11, 10, 9, 8, 7, 6, 7, 8, 9, 10, 11, 12 },
+  { 11, 10, 9, 8, 7, 6, 5, 6, 7, 8, 9, 10, 11 },
+  { 10, 9, 8, 7, 6, 5, 4, 5, 6, 7, 8, 9, 10 },
+  { 9, 8, 7, 6, 5, 4, 3, 4, 5, 6, 7, 8, 9 },
+  { 8, 7, 6, 5, 4, 3, 2, 3, 4, 5, 6, 7, 8 },
+  { 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7 },
+  { 6, 5, 4, 3, 2, 1, 0, 1, 2, 3, 4, 5, 6 },
+  { 7, 6, 5, 4, 3, 2, 1, 2, 3, 4, 5, 6, 7 },
+  { 8, 7, 6, 5, 4, 3, 2, 3, 4, 5, 6, 7, 8 },
+  { 9, 8, 7, 6, 5, 4, 3, 4, 5, 6, 7, 8, 9 },
+  { 10, 9, 8, 7, 6, 5, 4, 5, 6, 7, 8, 9, 10 },
+  { 11, 10, 9, 8, 7, 6, 5, 6, 7, 8, 9, 10, 11 },
+  { 12, 11, 10, 9, 8, 7, 6, 7, 8, 9, 10, 11, 12 }
 };
 
 void initializeWallMaze() {
@@ -131,6 +145,64 @@ bool isValid(int row, int col) {
   return (row >= 0 && col >= 0 && row < SIZE && col < SIZE);
 }
 
+void leftAverageValCode() {
+  if(leftCount < PID_SIZE) {
+    iLeft = leftCount & PID_SIZE;
+    arrLeft[iLeft] = leftSensor.data;
+    leftCount++;
+    long total = 0;
+    for(int val = 0; val < leftCount; val++) {
+      total += arrLeft[val];
+      Serial.print(arrLeft[val]); Serial.print("    ");
+    }
+    leftAverage = total * 1.0 / leftCount;
+    Serial.println("");
+    Serial.println(leftAverage);
+  } else {
+    leftUsable = true;
+    iLeft = leftCount % PID_SIZE;
+    arrLeft[iLeft] = leftSensor.data;
+    leftCount++;
+    long total = 0;
+    for(int val = 0; val < leftCount; val++) {
+      total += arrLeft[val];
+      Serial.print(arrLeft[val]); Serial.print("    ");
+    }
+    leftAverage = total * 1.0 / leftCount;
+    Serial.println("");
+    Serial.println(leftAverage);
+  }
+}
+
+void rightAverageValCode() {
+  if(rightCount < PID_SIZE) {
+    iRight = rightCount & PID_SIZE;
+    arrRight[iRight] = rightSensor.data;
+    rightCount++;
+    long total = 0;
+    for(int val = 0; val < rightCount; val++) {
+      total += arrRight[val];
+      Serial.print(arrRight[val]); Serial.print("    ");
+    }
+    rightAverage = total * 1.0 / rightCount;
+    Serial.println("");
+    Serial.println(rightAverage);
+  } else {
+    rightUsable = true;
+    iRight = rightCount % PID_SIZE;
+    arrRight[iRight] = rightSensor.data;
+    rightCount++;
+    long total = 0;
+    for(int val = 0; val < rightCount; val++) {
+      total += arrRight[val];
+      Serial.print(arrRight[val]); Serial.print("    ");
+    }
+    rightAverage = total * 1.0 / rightCount;
+    Serial.println("");
+    Serial.println(rightAverage);
+  }
+}
+
 void TuningTaskCode() {
   if(leftSensor.data < rightSensor.data) { rightWheelObj.speed--; }
   else if(leftSensor.data > rightSensor.data) { leftWheelObj.speed--; }
@@ -142,47 +214,18 @@ void ForwardTaskCode() {
   rightWheelObj.moveForward();
 }
 
-void GetLeftPulseTaskCode() {
-  cli();
-  sei();
-}
-void leftCounter() {
-  leftPulse++;
-}
-void GetRightPulseTaskCode() {
-  cli();
-  sei();
-}
-void rightCounter() {
-  rightPulse++;
-}
+void GetLeftPulseTaskCode() { cli(); sei(); }
+void leftCounter() { leftPulse++; }
+void GetRightPulseTaskCode() { cli(); sei(); }
+void rightCounter() { rightPulse++; }
 
-void frontDetectCode() {
-  frontSensor.retrieveData();
-}
+void frontDetectCode() { frontSensor.retrieveData(); }
+void leftDetectCode() { leftSensor.retrieveData(); }
+void rightDetectCode() { rightSensor.retrieveData(); }
+void frontIRCode() { IRFront.retrieveData(); }
+void leftIRCode() { IRLeft.retrieveData(); }
+void rightIRCode() { IRRight.retrieveData(); }
 
-void leftDetectCode() {
-  leftSensor.retrieveData();
-}
-
-void rightDetectCode() {
-  rightSensor.retrieveData();
-}
-
-void frontIRCode() {
-  IRFront.retrieveData();
-}
-
-void leftIRCode() {
-  IRLeft.retrieveData();
-
-}
-
-void rightIRCode() {
-  IRRight.retrieveData();
-}
-
-// ***
 void PIDTaskCode() {
   if (leftAverage >= SIDE_DIST_THRESH) {
     error = SIDE_DIST_THRESH - rightAverage;
@@ -236,9 +279,8 @@ void PIDTaskCode() {
 
   Serial.println(error);
 }
-// ***
 
-//Update the maze based on encoder reading
+// Update the maze based on encoder reading
 void updateMazeCode() {
   if (isValid(row, col)) {
     switch (movement) {
@@ -539,7 +581,7 @@ void checkMovementCode() {
   }
 }
 
-//Execute the locomotion code
+// Execute the locomotion code
 void executeMovementCode() {
   // Serial.print("Maze array element: ");
   // Serial.print(myRobot.Maze[row][col]);
@@ -638,7 +680,7 @@ void executeMovementCode() {
   // }
 }
 
-//Help map the maze
+// Help map the maze
 void mazeMappingCode() {
   myRobot.visited[row][col] = true;
   switch (pathType) {
@@ -887,9 +929,11 @@ void setup() {
   // getFront.enable();
   // getLeft.enable();
   // getRight.enable();
-  // PIDTask.enable();
+  leftAverageVal.enable();
+  rightAverageVal.enable();
+  PIDTask.enable();
   ForwardTask.enable();
-  TuningTask.enable();
+  // TuningTask.enable();
 }
 
 void loop() {
@@ -916,7 +960,9 @@ void loop() {
   // getFront.check();
   // getLeft.check();
   // getRight.check();
-  // PIDTask.check();
+  leftAverageVal.check();
+  rightAverageVal.check();
+  PIDTask.check();
   ForwardTask.check();
-  TuningTask.check();
+  // TuningTask.check();
 }
