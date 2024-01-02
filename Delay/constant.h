@@ -6,6 +6,11 @@
 #define RIGHT_DIR_1 29
 #define RIGHT_DIR_2 30
 
+#define RIGHT_TRIG 8
+#define RIGHT_ECHO 9
+#define LEFT_TRIG 4
+#define LEFT_ECHO 5
+
 #define LEFT_ENC 21
 #define LEFT_PIN 19
 
@@ -16,9 +21,8 @@
 // Constants
 #define SIZE 13
 #define TEST_SIZE 6
-#define LINEAR_DELAY 1000
-#define TURN_DELAY 1000
-#define MOTOR_SPEED 150
+#define LINEAR_DELAY 850
+#define TURN_DELAY 520
 
 enum {
   FORWARD,

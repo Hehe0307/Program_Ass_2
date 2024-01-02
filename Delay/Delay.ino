@@ -7,14 +7,21 @@
 #include "rightWheel.h"
 #include "IR.h"
 #include "robot.h"
+#include "ultrasonic.h"
+
+int LEFT_MOTOR_SPEED = 240;
+int RIGHT_MOTOR_SPEED = 240;
 
 // Object Declaration
-leftWheel leftWheelObj(LEFT_PWM, LEFT_DIR_1, LEFT_DIR_2, MOTOR_SPEED);
-rightWheel rightWheelObj(RIGHT_PWM, RIGHT_DIR_1, RIGHT_DIR_2, MOTOR_SPEED);
+leftWheel leftWheelObj(LEFT_PWM, LEFT_DIR_1, LEFT_DIR_2, LEFT_MOTOR_SPEED);
+rightWheel rightWheelObj(RIGHT_PWM, RIGHT_DIR_1, RIGHT_DIR_2, RIGHT_MOTOR_SPEED);
 IR IRFront(FRONT_IR);
 IR IRLeft(LEFT_IR);
 IR IRRight(RIGHT_IR);
 robot myRobot(leftWheelObj, rightWheelObj, IRFront, IRLeft, IRRight);
+
+ultrasonic rightSensor(RIGHT_TRIG, RIGHT_ECHO);
+ultrasonic leftSensor(LEFT_TRIG, LEFT_ECHO);
 
 int row = 5;
 int col = 0;
@@ -42,7 +49,7 @@ bool West_Wall[SIZE][SIZE];
 //   { 11, 10, 9, 8, 7, 6, 5, 6, 7, 8, 9, 10, 11 },
 //   { 12, 11, 10, 9, 8, 7, 6, 7, 8, 9, 10, 11, 12 }
 // };
-const int refMaze[TEST_SIZE][TEST_SIZE] = {
+int refMaze[TEST_SIZE][TEST_SIZE] = {
 {4, 3, 2, 2, 3, 4},
 {3, 2, 1, 1, 2, 3},
 {2, 1, 0, 0, 1, 2},
@@ -53,6 +60,28 @@ const int refMaze[TEST_SIZE][TEST_SIZE] = {
 
 bool isValid(int row, int col) { return (row >= 0 && col >= 0 && row < TEST_SIZE && col < TEST_SIZE); }
 // bool isValid(int row, int col) { return (row >= 0 && col >= 0 && row < SIZE && col < SIZE); }
+
+void FollowLeft()
+{
+  leftSensor.retrieveData();
+  LEFT_MOTOR_SPEED = (3.3/leftSensor.data) * 250.0;
+  RIGHT_MOTOR_SPEED = (leftSensor.data/3.3) * 250.0;
+    if(LEFT_MOTOR_SPEED > 255)
+    LEFT_MOTOR_SPEED = 255;
+    if(RIGHT_MOTOR_SPEED > 255)
+    RIGHT_MOTOR_SPEED = 255;
+}
+
+void FollowRight()
+{
+  rightSensor.retrieveData();
+  LEFT_MOTOR_SPEED = (rightSensor.data/3.3) * 250.0;
+  RIGHT_MOTOR_SPEED = (3.3/rightSensor.data) * 250.0;
+    if(LEFT_MOTOR_SPEED > 255)
+    LEFT_MOTOR_SPEED = 255;
+    if(RIGHT_MOTOR_SPEED > 255)
+    RIGHT_MOTOR_SPEED = 255;
+}
 
 void initializeMaze() {
   for (int i = 0; i < TEST_SIZE; i++) {
@@ -89,15 +118,20 @@ void checkMovement() {
     if (IRFront.status && IRLeft.status && IRRight.status) {  // dead end
       movement = BACKWARD;
       pathType = DEAD_END;
+      refMaze[row][col]+=5;
     } else if (!IRFront.status && IRLeft.status && IRRight.status) {  // obstacle at left & right
       pathType = STRAIGHT_LEFT_RIGHT;
       movement = FORWARD;
+      refMaze[row][col]+=2;
+      // FollowLeft();
     } else if (IRFront.status && !IRLeft.status && IRRight.status) {  // obstacle at front & right
       pathType = RIGHT_CORNER;
       movement = LEFT;
+      refMaze[row][col]+=2;
     } else if (IRFront.status && IRLeft.status && !IRRight.status) {  // obstacle at front & left
       pathType = LEFT_CORNER;
       movement = RIGHT;
+      refMaze[row][col]+=2;
     } else if (IRFront.status && !IRLeft.status && !IRRight.status) {  // obstacle at front
       pathType = T_JUNCTION;
       switch (direction) {
@@ -127,8 +161,10 @@ void checkMovement() {
             break;
           }
       }
+      refMaze[row][col]+=2;
     } else if (!IRFront.status && IRLeft.status && !IRRight.status) {  // obstacle at left
       pathType = STRAIGHT_LEFT;
+      // FollowLeft();
       switch (direction) {
         case NORTH:
           if (refMaze[row - 1][col] > refMaze[row][col + 1]) { movement = RIGHT; }
@@ -156,8 +192,10 @@ void checkMovement() {
             break;
           }
       }
+      refMaze[row][col]+=2;
     } else if (!IRFront.status && !IRLeft.status && IRRight.status) {  // obstacle at right
       pathType = STRAIGHT_RIGHT;
+      // FollowRight();
       switch (direction) {
         case NORTH:
           if (refMaze[row - 1][col] > refMaze[row][col - 1]) { movement = LEFT; }
@@ -185,6 +223,7 @@ void checkMovement() {
             break;
           }
       }
+       refMaze[row][col]+=2;
     } else {  // no obstacle ahead
       pathType = STRAIGHT_LEFT_RIGHT;
       switch (direction) {
@@ -213,18 +252,19 @@ void checkMovement() {
           break;
         }
       }
+        refMaze[row][col]+=2;
     }
   }
 }
 
 void executeMovement() {
-  Serial.print("Maze array element: ");
-  Serial.print(Maze[row][col]);
+  Serial.print("Initial refMaze array element: ");
+  Serial.print(refMaze[row][col]);
   Serial.print("    ");
   switch (movement) {
     case FORWARD: {
       myRobot.forwardMovement();
-      // Serial.println("Forward");
+      Serial.println("Forward");
       delay(LINEAR_DELAY);
       myRobot.stopMovement();
       // Serial.println("Stop");
@@ -236,7 +276,7 @@ void executeMovement() {
     }
     case LEFT: {
       myRobot.leftMovement();
-      // Serial.println("Left");
+      Serial.println("Left");
       delay(TURN_DELAY);
       myRobot.forwardMovement();
       // Serial.println("Forward");
@@ -251,7 +291,7 @@ void executeMovement() {
     }
     case RIGHT: {
       myRobot.rightMovement();
-      // Serial.println("Right");
+      Serial.println("Right");
       delay(TURN_DELAY);
       myRobot.forwardMovement();
       // Serial.println("Forward");
@@ -266,7 +306,7 @@ void executeMovement() {
     }
     case BACKWARD: {
       myRobot.backwardMovement();
-      // Serial.println("Backward");
+      Serial.println("Backward");
       delay(LINEAR_DELAY);
       myRobot.stopMovement();
       // Serial.println("Stop");
@@ -278,11 +318,18 @@ void executeMovement() {
     }
     default: {
       myRobot.stopMovement();
-      // Serial.println("Stop");
+      // Serial.println(a"Stop");
       break;
     }
   }
-}
+  Serial.print("refMaze array element after moving: ");
+  Serial.print(refMaze[row][col]);
+  Serial.println("    ");
+
+  Serial.print("row and col after moving: ");
+  Serial.print(row); Serial.print("    "); Serial.print(col);
+  Serial.println("    ");
+}  
 
 void markWall() {
   visited[row][col] = true;
@@ -440,13 +487,14 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if(refMaze[row][col] != 0) {
+  // if(refMaze[row][col] != 0) {
     checkMovement(); delay(500);
     markWall(); delay(500);
     executeMovement(); delay(2000);
-  }
-  if(refMaze[row][col] == 0) {
-    myRobot.stopMovement();
-    Serial.println("End");
-  }
+    // Serial.println(LEFT_MOTOR_SPEED); 
+  // }
+  // else {
+    //myRobot.stopMovement();
+  //   Serial.println("End");
+  // }
 }

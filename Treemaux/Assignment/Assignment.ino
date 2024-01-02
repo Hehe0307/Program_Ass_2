@@ -12,8 +12,8 @@
 #include "robot.h"
 
 // Object Declaration
-leftWheel leftWheelObj(LEFT_PWM, LEFT_DIR_1, LEFT_DIR_2, 130);
-rightWheel rightWheelObj(RIGHT_PWM, RIGHT_DIR_1, RIGHT_DIR_2, 130);
+leftWheel leftWheelObj(LEFT_PWM, LEFT_DIR_1, LEFT_DIR_2, 200);
+rightWheel rightWheelObj(RIGHT_PWM, RIGHT_DIR_1, RIGHT_DIR_2, 195);
 ultrasonic frontSensor(FRONT_TRIG, FRONT_ECHO);
 ultrasonic rightSensor(RIGHT_TRIG, RIGHT_ECHO);
 ultrasonic leftSensor(LEFT_TRIG, LEFT_ECHO);
@@ -55,14 +55,14 @@ TimedAction frontIRDetect = TimedAction(TASK_INTERVAL, frontIRCode);
 TimedAction leftIRDetect = TimedAction(TASK_INTERVAL, leftIRCode);
 TimedAction rightIRDetect = TimedAction(TASK_INTERVAL, rightIRCode);
 TimedAction frontDetect = TimedAction(PID_TASK_INTERVAL, frontDetectCode);
-TimedAction leftDetect = TimedAction(PID_TASK_INTERVAL, leftDetectCode);
+TimedAction leftDetect =  TimedAction(PID_TASK_INTERVAL, leftDetectCode);
 TimedAction rightDetect = TimedAction(PID_TASK_INTERVAL, rightDetectCode);
 TimedAction mazeMapping = TimedAction(TASK_INTERVAL, mazeMappingCode);
 TimedAction getFront = TimedAction(TASK_INTERVAL, getFrontGrid);
 TimedAction getLeft = TimedAction(TASK_INTERVAL, getLeftGrid);
 TimedAction getRight = TimedAction(TASK_INTERVAL, getRightGrid);
 TimedAction TuningTask = TimedAction(PID_TASK_INTERVAL, TuningTaskCode);
-TimedAction PIDTask = TimedAction(TASK_INTERVAL, PIDTaskCode);
+TimedAction PIDTask = TimedAction(PID_TASK_INTERVAL, PIDTaskCode);
 TimedAction ForwardTask = TimedAction(TASK_INTERVAL, ForwardTaskCode);
 TimedAction leftAverageVal = TimedAction(PID_TASK_INTERVAL, leftAverageValCode);
 TimedAction rightAverageVal = TimedAction(PID_TASK_INTERVAL, rightAverageValCode);
@@ -74,8 +74,6 @@ int col = 0;
 int row_num = 0;
 int col_num = 0;
 
-bool leftUsable = false;
-bool rightUsable = false;
 int leftCount = 0;
 int rightCount = 0;
 float leftAverage = 0.0;
@@ -91,10 +89,10 @@ int derivative = 0;
 int integral = 0;
 int integralLimit = 500;
 int PIDOutputVal = 0;
-int PIDOutputMax = 40;
-int kp = 30;
-int ki = 0;
-int kd = 0;
+int PIDOutputMax = 30;
+int kp = 700;
+int ki = 5;
+int kd = 3;
 
 bool No_Wall[SIZE][SIZE];
 bool North_Wall[SIZE][SIZE];
@@ -147,71 +145,78 @@ bool isValid(int row, int col) {
 
 void leftAverageValCode() {
   if(leftCount < PID_SIZE) {
-    iLeft = leftCount & PID_SIZE;
-    arrLeft[iLeft] = leftSensor.data;
-    leftCount++;
-    long total = 0;
-    for(int val = 0; val < leftCount; val++) {
-      total += arrLeft[val];
-      Serial.print(arrLeft[val]); Serial.print("    ");
-    }
-    leftAverage = total * 1.0 / leftCount;
-    Serial.println("");
-    Serial.println(leftAverage);
-  } else {
-    leftUsable = true;
     iLeft = leftCount % PID_SIZE;
     arrLeft[iLeft] = leftSensor.data;
     leftCount++;
     long total = 0;
     for(int val = 0; val < leftCount; val++) {
       total += arrLeft[val];
-      Serial.print(arrLeft[val]); Serial.print("    ");
+      // Serial.print(arrLeft[val]); Serial.print("    ");
     }
     leftAverage = total * 1.0 / leftCount;
-    Serial.println("");
-    Serial.println(leftAverage);
+    // Serial.println("");
+    // Serial.println(leftAverage);
+  } else {
+    iLeft = leftCount % PID_SIZE;
+    leftAverage -= arrLeft[iLeft];
+    arrLeft[iLeft] = leftSensor.data;
+    leftCount++;
+    long total = 0;
+    for(int val = 0; val < PID_SIZE; val++) {
+      total += arrLeft[val];
+      // Serial.print(arrLeft[val]); Serial.print("    ");
+    }
+    leftAverage = total * 1.0 / PID_SIZE;
+    // Serial.println("");
+    // Serial.println(leftAverage);
   }
 }
 
 void rightAverageValCode() {
   if(rightCount < PID_SIZE) {
-    iRight = rightCount & PID_SIZE;
-    arrRight[iRight] = rightSensor.data;
-    rightCount++;
-    long total = 0;
-    for(int val = 0; val < rightCount; val++) {
-      total += arrRight[val];
-      Serial.print(arrRight[val]); Serial.print("    ");
-    }
-    rightAverage = total * 1.0 / rightCount;
-    Serial.println("");
-    Serial.println(rightAverage);
-  } else {
-    rightUsable = true;
     iRight = rightCount % PID_SIZE;
     arrRight[iRight] = rightSensor.data;
     rightCount++;
     long total = 0;
     for(int val = 0; val < rightCount; val++) {
       total += arrRight[val];
-      Serial.print(arrRight[val]); Serial.print("    ");
+      // Serial.print(arrRight[val]); Serial.print("    ");
     }
     rightAverage = total * 1.0 / rightCount;
-    Serial.println("");
-    Serial.println(rightAverage);
+    // Serial.println("");
+    // Serial.println(rightAverage);
+  } else {
+    iRight = rightCount % PID_SIZE;
+    rightAverage -= arrRight[iRight];
+    arrRight[iRight] = rightSensor.data;
+    rightCount++;
+    long total = 0;
+    for(int val = 0; val < PID_SIZE; val++) {
+      total += arrRight[val];
+      // Serial.print(arrRight[val]); Serial.print("    ");
+    }
+    rightAverage = total * 1.0 / PID_SIZE;
+    // Serial.println("");
+    // Serial.println(rightAverage);
   }
 }
 
 void TuningTaskCode() {
-  if(leftSensor.data < rightSensor.data) { rightWheelObj.speed--; }
-  else if(leftSensor.data > rightSensor.data) { leftWheelObj.speed--; }
-  else { leftWheelObj.speed = 130; rightWheelObj.speed = 130; }  
+  if(leftSensor.data < rightSensor.data) { leftWheelObj.speed++; }
+  else { leftWheelObj.speed--; }
+  if(leftSensor.data > rightSensor.data) { rightWheelObj.speed++; } 
+  else { rightWheelObj.speed++; }
+  // Serial.print("left: "); Serial.print(leftSensor.data); Serial.print("   ");
+  // Serial.print("right: "); Serial.print(rightSensor.data); Serial.print("   ");
+  // Serial.print("left speed: "); Serial.print(leftWheelObj.speed); Serial.print("   ");
+  // Serial.print("right speed: "); Serial.println(rightWheelObj.speed);
 }
 
 void ForwardTaskCode() {
   leftWheelObj.moveForward();
   rightWheelObj.moveForward();
+  // Serial.print("left speed: "); Serial.print(leftWheelObj.speed); Serial.print("   ");
+  // Serial.print("right speed: "); Serial.println(rightWheelObj.speed);
 }
 
 void GetLeftPulseTaskCode() { cli(); sei(); }
@@ -227,16 +232,16 @@ void leftIRCode() { IRLeft.retrieveData(); }
 void rightIRCode() { IRRight.retrieveData(); }
 
 void PIDTaskCode() {
-  if (leftAverage >= SIDE_DIST_THRESH) {
+  if (leftAverage >= SIDE_DIST_THRESH && rightAverage >= SIDE_DIST_THRESH) {
+    return;
+  }
+
+  else if (leftAverage >= SIDE_DIST_THRESH) {
     error = SIDE_DIST_THRESH - rightAverage;
   }
 
   else if (rightAverage >= SIDE_DIST_THRESH) {
     error = leftAverage - SIDE_DIST_THRESH;
-  }
-
-  else if (leftAverage >= SIDE_DIST_THRESH && rightAverage >= SIDE_DIST_THRESH) {
-    return;
   }
 
   else {
@@ -248,15 +253,15 @@ void PIDTaskCode() {
   }
 
   else {
-    derivative = (error - prevError);
-    integral += (5 * (error + prevError));
+    derivative = error - prevError;
+    integral += (20 * (error + prevError));
 
     if (integral > integralLimit) {
       integral = integralLimit;
     }
 
-    else if (integral < -(integralLimit)) {
-      integral = -(integralLimit);
+    else if (integral < -integralLimit) {
+      integral = -integralLimit;
     }
 
     PIDOutputVal = (kp * error + ki * integral + kd * derivative) / 1000;
@@ -266,18 +271,20 @@ void PIDTaskCode() {
     PIDOutputVal = PIDOutputMax;
   }
 
-  else if (PIDOutputVal > -(PIDOutputMax)) {
-    PIDOutputVal = -(PIDOutputMax);
-  }
+  else if (PIDOutputVal < -PIDOutputMax)
+    PIDOutputVal = -PIDOutputMax;
 
   cli();
   leftWheelObj.speed = leftWheelObj.speed - PIDOutputVal;
-  rightWheelObj.speed = rightWheelObj.speed - PIDOutputVal;
+  rightWheelObj.speed = rightWheelObj.speed + PIDOutputVal;
   sei();
 
   prevError = error;
 
-  Serial.println(error);
+  // Serial.print(leftAverage); Serial.print(","); 
+  // Serial.print(rightAverage); Serial.print(","); 
+  Serial.print(error); Serial.print(",");
+  Serial.println(PIDOutputVal);
 }
 
 // Update the maze based on encoder reading
@@ -895,6 +902,7 @@ void getRightGrid() {
 
 void setup() {
   Serial.begin(9600);
+  delay(1000);
   myRobot.initializeMaze();
   initializeWallMaze();
   movement = FORWARD;
